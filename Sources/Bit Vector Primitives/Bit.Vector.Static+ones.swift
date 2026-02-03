@@ -13,14 +13,12 @@ import Property_Primitives
 
 extension Bit.Vector.Static {
     @inlinable
-    public var ones: Property<Bit.Vector.Ones, Self>.View {
-        mutating _read {
-            yield unsafe Property<Bit.Vector.Ones, Self>.View(&self)
-        }
+    public var ones: Property<Bit.Vector.Ones, Self> {
+        Property(self)
     }
 }
 
-extension Property.View where Tag == Bit.Vector.Ones {
+extension Property where Tag == Bit.Vector.Ones {
     /// Calls the closure for each index where the bit is set.
     ///
     /// - Parameter body: A closure that receives each set bit's index.
@@ -29,7 +27,7 @@ extension Property.View where Tag == Bit.Vector.Ones {
     public func forEach<let wordCount: Int>(_ body: (Bit.Index) -> Void) where Base == Bit.Vector.Static<wordCount> {
         for wordIndex in 0..<wordCount {
             let wordBase = Bit.Index(Index_Primitives.Index<UInt>.Count(Cardinal(UInt(wordIndex))) * .bitsPerWord)
-            unsafe base.pointee._storage[wordIndex].set.forEach { bitIndex in
+            base._storage[wordIndex].set.forEach { bitIndex in
                 let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
                 body(globalIndex)
             }

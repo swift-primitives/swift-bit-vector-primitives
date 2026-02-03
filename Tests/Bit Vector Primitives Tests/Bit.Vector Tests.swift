@@ -72,7 +72,7 @@ struct BitVectorTests {
     @Test("Iterate set bits")
     func iterateSetBits() {
         let capacity: Bit.Index.Count = 200
-        var bits = Bit.Vector(capacity: capacity)
+        let bits = Bit.Vector(capacity: capacity)
 
         bits[5] = true
         bits[100] = true
