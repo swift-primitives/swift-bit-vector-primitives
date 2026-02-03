@@ -9,32 +9,31 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Property_Primitives
+import Index_Primitives
 
 extension Bit.Vector {
+    /// Non-mutating accessor for iterating set bits.
+    ///
+    /// Returns a lightweight view that captures the word pointer, word count,
+    /// and capacity. Safe to use from any context including `deinit`.
     @inlinable
-    public var ones: Property<Ones, Self>.View {
-        mutating _read {
-            yield unsafe Property<Ones, Self>.View(&self)
-        }
+    public var ones: Ones.View {
+        unsafe Ones.View(words: _words, wordCount: _wordCount, capacity: capacity)
     }
 }
 
-extension Property.View where Tag == Bit.Vector.Ones, Base == Bit.Vector {
+extension Bit.Vector.Ones.View {
     /// Calls the closure for each index where the bit is set.
     ///
     /// - Parameter body: A closure that receives each set bit's index.
     /// - Complexity: O(popcount) — only visits set bits.
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
-        let capacity = unsafe base.pointee.capacity
-        let wordCount = unsafe base.pointee._wordCount
-
-        (.zero..<wordCount).forEach { wordIndex in
+        (.zero..<_wordCount).forEach { wordIndex in
             let wordBase = Bit.Index(Index_Primitives.Index<UInt>.Count(wordIndex) * .bitsPerWord)
-            unsafe base.pointee._words[wordIndex].set.forEach { bitIndex in
+            unsafe _words[wordIndex].set.forEach { bitIndex in
                 let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
-                if globalIndex < capacity {
+                if globalIndex < _capacity {
                     body(globalIndex)
                 }
             }
