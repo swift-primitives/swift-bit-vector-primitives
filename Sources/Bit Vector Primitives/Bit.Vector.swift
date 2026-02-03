@@ -43,11 +43,6 @@ extension Bit {
     @safe
     public struct Vector: ~Copyable {
         @usableFromInline
-        static var bitsPerWord: Bit.Index.Count {
-            Bit.Index.Count(Cardinal(UInt(UInt.bitWidth)))
-        }
-
-        @usableFromInline
         package var _words: UnsafeMutablePointer<UInt>
 
         @usableFromInline

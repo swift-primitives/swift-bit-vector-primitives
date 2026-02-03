@@ -35,11 +35,6 @@ extension Bit.Vector {
     /// ```
     public struct Static<let wordCount: Int>: Sendable {
         @usableFromInline
-        static var bitsPerWord: Bit.Index.Count {
-            Bit.Index.Count(Cardinal(UInt(UInt.bitWidth)))
-        }
-
-        @usableFromInline
         package var _storage: InlineArray<wordCount, UInt>
 
         /// The capacity in bits.
