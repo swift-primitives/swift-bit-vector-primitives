@@ -45,8 +45,9 @@ extension Bit {
         @usableFromInline
         package var _words: UnsafeMutablePointer<UInt>
 
+        /// Word count — stored as Int for direct use in pointer operations.
         @usableFromInline
-        package let _wordCount: Bit.Index.Count
+        package let _wordCount: Int
 
         /// The capacity in bits.
         public let capacity: Bit.Index.Count
@@ -58,25 +59,22 @@ extension Bit {
         /// - Parameter capacity: The number of bits to track.
         @inlinable
         public init(capacity: Bit.Index.Count) {
-            let bitsPerWord = UInt(UInt.bitWidth)
-            let capacityRaw = capacity.rawValue.rawValue
-            let wordCountRaw = (capacityRaw + bitsPerWord - 1) / bitsPerWord
-            let wordCount = Bit.Index.Count(Cardinal(wordCountRaw))
+            let capacityInt = Int(bitPattern: capacity)
+            let wordCount = (capacityInt + UInt.bitWidth - 1) / UInt.bitWidth
 
             self._wordCount = wordCount
             self.capacity = capacity
 
-            if wordCountRaw > 0 {
-                unsafe self._words = .allocate(capacity: Int(wordCountRaw))
-                unsafe _words.initialize(repeating: 0, count: Int(wordCountRaw))
+            if wordCount > 0 {
+                unsafe self._words = .allocate(capacity: wordCount)
+                unsafe _words.initialize(repeating: 0, count: wordCount)
             } else {
                 unsafe self._words = .init(bitPattern: 0x1)!  // Non-null sentinel for empty
             }
         }
 
         deinit {
-            let wordCountRaw = _wordCount.rawValue.rawValue
-            if wordCountRaw > 0 {
+            if _wordCount > 0 {
                 unsafe _words.deallocate()
             }
         }
@@ -93,21 +91,19 @@ extension Bit.Vector {
     @inlinable
     public subscript(index: Bit.Index) -> Bool {
         get {
-            let position = index.position.rawValue
-            let bitsPerWord = UInt(UInt.bitWidth)
-            let word = position / bitsPerWord
-            let bit = position % bitsPerWord
-            return unsafe (_words[Int(word)] & (1 << bit)) != 0
+            let position = Int(bitPattern: index)
+            let word = position / UInt.bitWidth
+            let bit = position % UInt.bitWidth
+            return unsafe (_words[word] & (1 << bit)) != 0
         }
         nonmutating set {
-            let position = index.position.rawValue
-            let bitsPerWord = UInt(UInt.bitWidth)
-            let word = position / bitsPerWord
-            let bit = position % bitsPerWord
+            let position = Int(bitPattern: index)
+            let word = position / UInt.bitWidth
+            let bit = position % UInt.bitWidth
             if newValue {
-                unsafe _words[Int(word)] |= (1 << bit)
+                unsafe _words[word] |= (1 << bit)
             } else {
-                unsafe _words[Int(word)] &= ~(1 << bit)
+                unsafe _words[word] &= ~(1 << bit)
             }
         }
     }
@@ -119,8 +115,7 @@ extension Bit.Vector {
     /// Clears all bits to false.
     @inlinable
     public func clearAll() {
-        let wordCount = Int(_wordCount.rawValue.rawValue)
-        for i in 0..<wordCount {
+        for i in 0..<_wordCount {
             unsafe _words[i] = 0
         }
     }
@@ -128,19 +123,16 @@ extension Bit.Vector {
     /// Sets all bits to true.
     @inlinable
     public func setAll() {
-        let wordCount = Int(_wordCount.rawValue.rawValue)
-        let bitsPerWord = UInt(UInt.bitWidth)
-
-        for i in 0..<wordCount {
+        for i in 0..<_wordCount {
             unsafe _words[i] = ~0
         }
 
         // Clear excess bits in last word if capacity is not word-aligned
-        let capacityRaw = capacity.rawValue.rawValue
-        let excessBits = UInt(wordCount) * bitsPerWord - capacityRaw
-        if excessBits > 0 && wordCount > 0 {
+        let capacityInt = Int(bitPattern: capacity)
+        let excessBits = _wordCount * UInt.bitWidth - capacityInt
+        if excessBits > 0 && _wordCount > 0 {
             let mask = UInt.max >> excessBits
-            unsafe _words[wordCount - 1] &= mask
+            unsafe _words[_wordCount - 1] &= mask
         }
     }
 
@@ -150,8 +142,7 @@ extension Bit.Vector {
     @inlinable
     public var popcount: Bit.Index.Count {
         var total: UInt = 0
-        let wordCount = Int(_wordCount.rawValue.rawValue)
-        for i in 0..<wordCount {
+        for i in 0..<_wordCount {
             total += UInt(unsafe _words[i].nonzeroBitCount)
         }
         return Bit.Index.Count(Cardinal(total))
@@ -160,8 +151,7 @@ extension Bit.Vector {
     /// Whether all bits are false.
     @inlinable
     public var isEmpty: Bool {
-        let wordCount = Int(_wordCount.rawValue.rawValue)
-        for i in 0..<wordCount {
+        for i in 0..<_wordCount {
             if unsafe _words[i] != 0 { return false }
         }
         return true
@@ -183,15 +173,14 @@ extension Bit.Vector {
     /// - Complexity: O(popcount) — only visits set bits.
     @inlinable
     public func forEachSetBit(_ body: (Bit.Index) -> Void) {
-        let wordCount = Int(_wordCount.rawValue.rawValue)
-        let bitsPerWord = UInt(UInt.bitWidth)
+        let capacityInt = Int(bitPattern: capacity)
 
-        for wordIndex in 0..<wordCount {
-            let baseOffset = UInt(wordIndex) * bitsPerWord
+        for wordIndex in 0..<_wordCount {
+            let baseOffset = wordIndex * UInt.bitWidth
             unsafe _words[wordIndex].forEachSetBit { bitIndex in
-                let globalIndex = baseOffset + UInt(bitIndex)
-                if globalIndex < capacity.rawValue.rawValue {
-                    body(Bit.Index(Ordinal(globalIndex)))
+                let globalBit = baseOffset + bitIndex
+                if globalBit < capacityInt {
+                    body(Bit.Index(Ordinal(UInt(globalBit))))
                 }
             }
         }
@@ -207,8 +196,7 @@ extension Bit.Vector {
     /// - Returns: The value returned by the closure.
     @inlinable
     public func withUnsafeWords<R>(_ body: (UnsafeBufferPointer<UInt>) -> R) -> R {
-        let wordCount = Int(_wordCount.rawValue.rawValue)
-        return unsafe body(UnsafeBufferPointer(start: _words, count: wordCount))
+        return unsafe body(UnsafeBufferPointer(start: _words, count: _wordCount))
     }
 
     /// Mutable access to the underlying word storage.
@@ -217,8 +205,7 @@ extension Bit.Vector {
     /// - Returns: The value returned by the closure.
     @inlinable
     public func withUnsafeMutableWords<R>(_ body: (UnsafeMutableBufferPointer<UInt>) -> R) -> R {
-        let wordCount = Int(_wordCount.rawValue.rawValue)
-        return unsafe body(UnsafeMutableBufferPointer(start: _words, count: wordCount))
+        return unsafe body(UnsafeMutableBufferPointer(start: _words, count: _wordCount))
     }
 }
 

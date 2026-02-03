@@ -61,17 +61,15 @@ extension Bit.Vector.Static {
     @inlinable
     public subscript(index: Bit.Index) -> Bool {
         get {
-            let position = index.position.rawValue
-            let bitsPerWord = UInt(UInt.bitWidth)
-            let word = Int(position / bitsPerWord)
-            let bit = position % bitsPerWord
+            let position = Int(bitPattern: index)
+            let word = position / UInt.bitWidth
+            let bit = position % UInt.bitWidth
             return (_storage[word] & (1 << bit)) != 0
         }
         set {
-            let position = index.position.rawValue
-            let bitsPerWord = UInt(UInt.bitWidth)
-            let word = Int(position / bitsPerWord)
-            let bit = position % bitsPerWord
+            let position = Int(bitPattern: index)
+            let word = position / UInt.bitWidth
+            let bit = position % UInt.bitWidth
             if newValue {
                 _storage[word] |= (1 << bit)
             } else {
@@ -105,11 +103,11 @@ extension Bit.Vector.Static {
     /// - Complexity: O(wordCount) using hardware popcount.
     @inlinable
     public var popcount: Bit.Index.Count {
-        var total: UInt = 0
+        var count: UInt = 0
         for i in 0..<wordCount {
-            total += UInt(_storage[i].nonzeroBitCount)
+            count += UInt(_storage[i].nonzeroBitCount)
         }
-        return Bit.Index.Count(Cardinal(total))
+        return Bit.Index.Count(Cardinal(count))
     }
 
     /// Whether all bits are false.
@@ -140,13 +138,11 @@ extension Bit.Vector.Static {
     /// - Complexity: O(popcount) — only visits set bits.
     @inlinable
     public func forEachSetBit(_ body: (Bit.Index) -> Void) {
-        let bitsPerWord = UInt(UInt.bitWidth)
-
         for wordIndex in 0..<wordCount {
-            let baseOffset = UInt(wordIndex) * bitsPerWord
+            let baseOffset = wordIndex * UInt.bitWidth
             _storage[wordIndex].forEachSetBit { bitIndex in
-                let globalIndex = baseOffset + UInt(bitIndex)
-                body(Bit.Index(Ordinal(globalIndex)))
+                let globalBit = baseOffset + bitIndex
+                body(Bit.Index(Ordinal(UInt(globalBit))))
             }
         }
     }
