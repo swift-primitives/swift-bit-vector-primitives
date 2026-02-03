@@ -82,22 +82,6 @@ extension Bit.Vector.Static {
 // MARK: - Bulk Operations
 
 extension Bit.Vector.Static {
-    /// Clears all bits to false.
-    @inlinable
-    public mutating func clearAll() {
-        for i in 0..<wordCount {
-            _storage[i] = 0
-        }
-    }
-
-    /// Sets all bits to true.
-    @inlinable
-    public mutating func setAll() {
-        for i in 0..<wordCount {
-            _storage[i] = ~0
-        }
-    }
-
     /// The number of bits set to true.
     ///
     /// - Complexity: O(wordCount) using hardware popcount.
@@ -129,21 +113,3 @@ extension Bit.Vector.Static {
     }
 }
 
-// MARK: - Iteration
-
-extension Bit.Vector.Static {
-    /// Calls the closure for each index where the bit is set.
-    ///
-    /// - Parameter body: A closure that receives each set bit's index.
-    /// - Complexity: O(popcount) — only visits set bits.
-    @inlinable
-    public func forEachSetBit(_ body: (Bit.Index) -> Void) {
-        for wordIndex in 0..<wordCount {
-            let baseOffset = wordIndex * UInt.bitWidth
-            _storage[wordIndex].forEachSetBit { bitIndex in
-                let globalBit = baseOffset + bitIndex
-                body(Bit.Index(Ordinal(UInt(globalBit))))
-            }
-        }
-    }
-}

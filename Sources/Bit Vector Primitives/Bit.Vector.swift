@@ -112,30 +112,6 @@ extension Bit.Vector {
 // MARK: - Bulk Operations
 
 extension Bit.Vector {
-    /// Clears all bits to false.
-    @inlinable
-    public func clearAll() {
-        for i in 0..<_wordCount {
-            unsafe _words[i] = 0
-        }
-    }
-
-    /// Sets all bits to true.
-    @inlinable
-    public func setAll() {
-        for i in 0..<_wordCount {
-            unsafe _words[i] = ~0
-        }
-
-        // Clear excess bits in last word if capacity is not word-aligned
-        let capacityInt = Int(bitPattern: capacity)
-        let excessBits = _wordCount * UInt.bitWidth - capacityInt
-        if excessBits > 0 && _wordCount > 0 {
-            let mask = UInt.max >> excessBits
-            unsafe _words[_wordCount - 1] &= mask
-        }
-    }
-
     /// The number of bits set to true.
     ///
     /// - Complexity: O(n/64) using hardware popcount.
@@ -161,29 +137,6 @@ extension Bit.Vector {
     @inlinable
     public var isFull: Bool {
         popcount == capacity
-    }
-}
-
-// MARK: - Iteration
-
-extension Bit.Vector {
-    /// Calls the closure for each index where the bit is set.
-    ///
-    /// - Parameter body: A closure that receives each set bit's index.
-    /// - Complexity: O(popcount) — only visits set bits.
-    @inlinable
-    public func forEachSetBit(_ body: (Bit.Index) -> Void) {
-        let capacityInt = Int(bitPattern: capacity)
-
-        for wordIndex in 0..<_wordCount {
-            let baseOffset = wordIndex * UInt.bitWidth
-            unsafe _words[wordIndex].forEachSetBit { bitIndex in
-                let globalBit = baseOffset + bitIndex
-                if globalBit < capacityInt {
-                    body(Bit.Index(Ordinal(UInt(globalBit))))
-                }
-            }
-        }
     }
 }
 

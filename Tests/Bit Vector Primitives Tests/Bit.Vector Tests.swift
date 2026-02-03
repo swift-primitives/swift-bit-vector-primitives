@@ -46,7 +46,7 @@ struct BitVectorTests {
     @Test("Clear all bits")
     func clearAll() {
         let capacity: Bit.Index.Count = 128
-        let bits = Bit.Vector(capacity: capacity)
+        var bits = Bit.Vector(capacity: capacity)
 
         bits[0] = true
         bits[64] = true
@@ -55,7 +55,7 @@ struct BitVectorTests {
         let expectedPopcount: Bit.Index.Count = 3
         #expect(bits.popcount == expectedPopcount)
 
-        bits.clearAll()
+        bits.clear.all()
         #expect(bits.isEmpty == true)
         #expect(bits.popcount == .zero)
     }
@@ -63,8 +63,8 @@ struct BitVectorTests {
     @Test("Set all bits")
     func setAll() {
         let capacity: Bit.Index.Count = 100
-        let bits = Bit.Vector(capacity: capacity)
-        bits.setAll()
+        var bits = Bit.Vector(capacity: capacity)
+        bits.set.all()
         #expect(bits.popcount == capacity)
         #expect(bits.isFull == true)
     }
@@ -72,14 +72,14 @@ struct BitVectorTests {
     @Test("Iterate set bits")
     func iterateSetBits() {
         let capacity: Bit.Index.Count = 200
-        let bits = Bit.Vector(capacity: capacity)
+        var bits = Bit.Vector(capacity: capacity)
 
         bits[5] = true
         bits[100] = true
         bits[150] = true
 
         var visited: [Bit.Index] = []
-        bits.forEachSetBit { visited.append($0) }
+        bits.ones.forEach { visited.append($0) }
 
         #expect(visited.count == 3)
         let expected0: Bit.Index = 5

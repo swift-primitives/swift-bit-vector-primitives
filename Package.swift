@@ -24,6 +24,7 @@ let package = Package(
     dependencies: [
         .package(path: "../swift-bit-primitives"),
         .package(path: "../swift-bit-pack-primitives"),
+        .package(path: "../swift-property-primitives"),
     ],
     targets: [
         .target(
@@ -31,6 +32,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Bit Primitives", package: "swift-bit-primitives"),
                 .product(name: "Bit Pack Primitives", package: "swift-bit-pack-primitives"),
+                .product(name: "Property Primitives", package: "swift-property-primitives"),
             ]
         ),
         .target(
