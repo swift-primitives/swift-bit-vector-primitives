@@ -29,16 +29,18 @@ extension Property.View where Tag == Bit.Vector.Set, Base == Bit.Vector {
     @inlinable
     public func all() {
         let wordCount = unsafe base.pointee._wordCount
-        for i in 0..<wordCount {
+        (.zero..<wordCount).forEach { i in
             unsafe base.pointee._words[i] = ~0
         }
 
         // Clear excess bits in last word if capacity is not word-aligned
         let pack = Bit.Pack<UInt>(count: unsafe base.pointee.capacity, bitsPerWord: .bitsPerWord)
         let unused = pack.bits.unused
-        if unused > .zero && wordCount > 0 {
+        if unused > .zero && wordCount > .zero {
+            let location = Bit.Pack<UInt>.Location(count: unsafe base.pointee.capacity, bitsPerWord: .bitsPerWord)
             let mask = UInt.max >> Int(bitPattern: unused)
-            unsafe base.pointee._words[wordCount - 1] &= mask
+            let current = unsafe base.pointee._words[location.word]
+            unsafe base.pointee._words[location.word] = current & mask
         }
     }
 }

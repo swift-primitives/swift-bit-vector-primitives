@@ -28,10 +28,10 @@ extension Property.View where Tag == Bit.Vector.Ones {
     @inlinable
     public func forEach<let wordCount: Int>(_ body: (Bit.Index) -> Void) where Base == Bit.Vector.Static<wordCount> {
         for wordIndex in 0..<wordCount {
-            let baseOffset = wordIndex * UInt.bitWidth
-            unsafe base.pointee._storage[wordIndex].forEachSetBit { bitIndex in
-                let globalBit = baseOffset + bitIndex
-                body(Bit.Index(Ordinal(UInt(globalBit))))
+            let wordBase = Bit.Index(Index_Primitives.Index<UInt>.Count(Cardinal(UInt(wordIndex))) * .bitsPerWord)
+            unsafe base.pointee._storage[wordIndex].set.forEach { bitIndex in
+                let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
+                body(globalIndex)
             }
         }
     }

@@ -45,9 +45,9 @@ extension Bit {
         @usableFromInline
         package var _words: UnsafeMutablePointer<UInt>
 
-        /// Word count — stored as Int for direct use in pointer operations.
+        /// Word count.
         @usableFromInline
-        package let _wordCount: Int
+        package let _wordCount: Index_Primitives.Index<UInt>.Count
 
         /// The capacity in bits.
         public let capacity: Bit.Index.Count
@@ -60,21 +60,20 @@ extension Bit {
         @inlinable
         public init(capacity: Bit.Index.Count) {
             let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
-            let wordCount = Int(bitPattern: pack.words.count)
 
-            self._wordCount = wordCount
+            self._wordCount = pack.words.count
             self.capacity = capacity
 
-            if wordCount > 0 {
-                unsafe self._words = .allocate(capacity: wordCount)
-                unsafe _words.initialize(repeating: 0, count: wordCount)
+            if _wordCount > .zero {
+                unsafe self._words = .allocate(capacity: Int(bitPattern: _wordCount))
+                unsafe _words.initialize(repeating: 0, count: _wordCount)
             } else {
                 unsafe self._words = .init(bitPattern: 0x1)!  // Non-null sentinel for empty
             }
         }
 
         deinit {
-            if _wordCount > 0 {
+            if _wordCount > .zero {
                 unsafe _words.deallocate()
             }
         }
@@ -92,15 +91,15 @@ extension Bit.Vector {
     public subscript(index: Bit.Index) -> Bool {
         get {
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
-            return unsafe (_words[Int(bitPattern: location.word)] & location.mask) != 0
+            return unsafe (_words[location.word] & location.mask) != 0
         }
         nonmutating set {
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
-            let word = Int(bitPattern: location.word)
+            let current = unsafe _words[location.word]
             if newValue {
-                unsafe _words[word] |= location.mask
+                unsafe _words[location.word] = current | location.mask
             } else {
-                unsafe _words[word] &= ~location.mask
+                unsafe _words[location.word] = current & ~location.mask
             }
         }
     }
@@ -115,7 +114,7 @@ extension Bit.Vector {
     @inlinable
     public var popcount: Bit.Index.Count {
         var total: UInt = 0
-        for i in 0..<_wordCount {
+        (.zero..<_wordCount).forEach { i in
             total += UInt(unsafe _words[i].nonzeroBitCount)
         }
         return Bit.Index.Count(Cardinal(total))
@@ -124,10 +123,7 @@ extension Bit.Vector {
     /// Whether all bits are false.
     @inlinable
     public var isEmpty: Bool {
-        for i in 0..<_wordCount {
-            if unsafe _words[i] != 0 { return false }
-        }
-        return true
+        !(.zero..<_wordCount).contains(where: { i in unsafe _words[i] != 0 })
     }
 
     /// Whether all bits are true.

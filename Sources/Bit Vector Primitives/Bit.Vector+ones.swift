@@ -27,15 +27,15 @@ extension Property.View where Tag == Bit.Vector.Ones, Base == Bit.Vector {
     /// - Complexity: O(popcount) — only visits set bits.
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
-        let capacityInt = Int(bitPattern: unsafe base.pointee.capacity)
+        let capacity = unsafe base.pointee.capacity
         let wordCount = unsafe base.pointee._wordCount
 
-        for wordIndex in 0..<wordCount {
-            let baseOffset = wordIndex * UInt.bitWidth
-            unsafe base.pointee._words[wordIndex].forEachSetBit { bitIndex in
-                let globalBit = baseOffset + bitIndex
-                if globalBit < capacityInt {
-                    body(Bit.Index(Ordinal(UInt(globalBit))))
+        (.zero..<wordCount).forEach { wordIndex in
+            let wordBase = Bit.Index(Index_Primitives.Index<UInt>.Count(wordIndex) * .bitsPerWord)
+            unsafe base.pointee._words[wordIndex].set.forEach { bitIndex in
+                let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
+                if globalIndex < capacity {
+                    body(globalIndex)
                 }
             }
         }
