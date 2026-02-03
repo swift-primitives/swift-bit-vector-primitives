@@ -23,21 +23,21 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../swift-bit-primitives"),
-        .package(path: "../swift-bit-packing-primitives"),
+        .package(path: "../swift-bit-pack-primitives"),
     ],
     targets: [
         .target(
             name: "Bit Vector Primitives",
             dependencies: [
                 .product(name: "Bit Primitives", package: "swift-bit-primitives"),
-                .product(name: "Bit Packing Primitives", package: "swift-bit-packing-primitives"),
+                .product(name: "Bit Pack Primitives", package: "swift-bit-pack-primitives"),
             ]
         ),
         .target(
             name: "Bit Vector Primitives Test Support",
             dependencies: [
                 "Bit Vector Primitives",
-                .product(name: "Bit Packing Primitives Test Support", package: "swift-bit-packing-primitives"),
+                .product(name: "Bit Pack Primitives Test Support", package: "swift-bit-pack-primitives"),
             ],
             path: "Tests/Support"
         ),
