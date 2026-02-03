@@ -59,8 +59,8 @@ extension Bit {
         /// - Parameter capacity: The number of bits to track.
         @inlinable
         public init(capacity: Bit.Index.Count) {
-            let capacityInt = Int(bitPattern: capacity)
-            let wordCount = (capacityInt + UInt.bitWidth - 1) / UInt.bitWidth
+            let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
+            let wordCount = Int(bitPattern: pack.words.count)
 
             self._wordCount = wordCount
             self.capacity = capacity
@@ -91,19 +91,16 @@ extension Bit.Vector {
     @inlinable
     public subscript(index: Bit.Index) -> Bool {
         get {
-            let position = Int(bitPattern: index)
-            let word = position / UInt.bitWidth
-            let bit = position % UInt.bitWidth
-            return unsafe (_words[word] & (1 << bit)) != 0
+            let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
+            return unsafe (_words[Int(bitPattern: location.word)] & location.mask) != 0
         }
         nonmutating set {
-            let position = Int(bitPattern: index)
-            let word = position / UInt.bitWidth
-            let bit = position % UInt.bitWidth
+            let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
+            let word = Int(bitPattern: location.word)
             if newValue {
-                unsafe _words[word] |= (1 << bit)
+                unsafe _words[word] |= location.mask
             } else {
-                unsafe _words[word] &= ~(1 << bit)
+                unsafe _words[word] &= ~location.mask
             }
         }
     }

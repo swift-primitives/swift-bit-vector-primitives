@@ -34,10 +34,10 @@ extension Property.View where Tag == Bit.Vector.Set, Base == Bit.Vector {
         }
 
         // Clear excess bits in last word if capacity is not word-aligned
-        let capacityInt = Int(bitPattern: unsafe base.pointee.capacity)
-        let excessBits = wordCount * UInt.bitWidth - capacityInt
-        if excessBits > 0 && wordCount > 0 {
-            let mask = UInt.max >> excessBits
+        let pack = Bit.Pack<UInt>(count: unsafe base.pointee.capacity, bitsPerWord: .bitsPerWord)
+        let unused = pack.bits.unused
+        if unused > .zero && wordCount > 0 {
+            let mask = UInt.max >> Int(bitPattern: unused)
             unsafe base.pointee._words[wordCount - 1] &= mask
         }
     }

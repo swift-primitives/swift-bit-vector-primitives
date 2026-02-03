@@ -61,19 +61,16 @@ extension Bit.Vector.Static {
     @inlinable
     public subscript(index: Bit.Index) -> Bool {
         get {
-            let position = Int(bitPattern: index)
-            let word = position / UInt.bitWidth
-            let bit = position % UInt.bitWidth
-            return (_storage[word] & (1 << bit)) != 0
+            let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
+            return (_storage[Int(bitPattern: location.word)] & location.mask) != 0
         }
         set {
-            let position = Int(bitPattern: index)
-            let word = position / UInt.bitWidth
-            let bit = position % UInt.bitWidth
+            let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
+            let word = Int(bitPattern: location.word)
             if newValue {
-                _storage[word] |= (1 << bit)
+                _storage[word] |= location.mask
             } else {
-                _storage[word] &= ~(1 << bit)
+                _storage[word] &= ~location.mask
             }
         }
     }
