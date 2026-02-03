@@ -97,9 +97,9 @@ extension Bit.Vector {
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
             let current = unsafe _words[location.word]
             if newValue {
-                _words[location.word] = current | location.mask
+                unsafe _words[location.word] = current | location.mask
             } else {
-                _words[location.word] = current & ~location.mask
+                unsafe _words[location.word] = current & ~location.mask
             }
         }
     }
