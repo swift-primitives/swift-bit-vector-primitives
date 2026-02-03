@@ -65,7 +65,7 @@ extension Bit {
             self.capacity = capacity
 
             if _wordCount > .zero {
-                unsafe self._words = .allocate(capacity: Int(bitPattern: _wordCount))
+                unsafe self._words = .allocate(capacity: _wordCount)
                 unsafe _words.initialize(repeating: 0, count: _wordCount)
             } else {
                 unsafe self._words = .init(bitPattern: 0x1)!  // Non-null sentinel for empty
@@ -97,9 +97,9 @@ extension Bit.Vector {
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
             let current = unsafe _words[location.word]
             if newValue {
-                unsafe _words[location.word] = current | location.mask
+                _words[location.word] = current | location.mask
             } else {
-                unsafe _words[location.word] = current & ~location.mask
+                _words[location.word] = current & ~location.mask
             }
         }
     }

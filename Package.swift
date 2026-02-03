@@ -25,6 +25,7 @@ let package = Package(
         .package(path: "../swift-bit-primitives"),
         .package(path: "../swift-bit-pack-primitives"),
         .package(path: "../swift-property-primitives"),
+        .package(path: "../swift-range-primitives"),
     ],
     targets: [
         .target(
@@ -33,6 +34,7 @@ let package = Package(
                 .product(name: "Bit Primitives", package: "swift-bit-primitives"),
                 .product(name: "Bit Pack Primitives", package: "swift-bit-pack-primitives"),
                 .product(name: "Property Primitives", package: "swift-property-primitives"),
+                .product(name: "Range Primitives", package: "swift-range-primitives"),
             ]
         ),
         .target(

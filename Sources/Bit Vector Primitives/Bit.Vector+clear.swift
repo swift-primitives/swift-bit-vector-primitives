@@ -28,7 +28,7 @@ extension Property.View where Tag == Bit.Vector.Clear, Base == Bit.Vector {
     /// Clears all bits to false.
     @inlinable
     public func all() {
-        (.zero..<unsafe base.pointee._wordCount).forEach { i in
+        unsafe (.zero..<base.pointee._wordCount).forEach { i in
             unsafe base.pointee._words[i] = 0
         }
     }
