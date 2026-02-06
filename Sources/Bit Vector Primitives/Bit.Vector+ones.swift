@@ -30,7 +30,7 @@ extension Bit.Vector.Ones.View {
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
         (.zero..<_wordCount).forEach { wordIndex in
-            let wordBase = Bit.Index(Index_Primitives.Index<UInt>.Count(wordIndex) * .bitsPerWord)
+            let wordBase = Bit.Index(__unchecked: (), Ordinal((Index_Primitives.Index<UInt>.Count(wordIndex) * .bitsPerWord).rawValue))
             unsafe _words[wordIndex].set.forEach { bitIndex in
                 let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
                 if globalIndex < _capacity {

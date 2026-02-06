@@ -26,7 +26,7 @@ extension Property where Tag == Bit.Vector.Ones {
     @inlinable
     public func forEach<let wordCount: Int>(_ body: (Bit.Index) -> Void) where Base == Bit.Vector.Static<wordCount> {
         for wordIndex in 0..<wordCount {
-            let wordBase = Bit.Index(Index_Primitives.Index<UInt>.Count(Cardinal(UInt(wordIndex))) * .bitsPerWord)
+            let wordBase = Bit.Index(__unchecked: (), Ordinal((Index_Primitives.Index<UInt>.Count(Cardinal(UInt(wordIndex))) * .bitsPerWord).rawValue))
             base._storage[wordIndex].set.forEach { bitIndex in
                 let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
                 body(globalIndex)
