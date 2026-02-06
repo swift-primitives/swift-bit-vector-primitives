@@ -123,4 +123,145 @@ struct BitVectorStaticTests {
         #expect(original[0] == false)
         #expect(copy[0] == true)
     }
+
+    @Test("set.range single word")
+    func setRangeSingleWord() {
+        var bits = Bit.Vector.Static<4>()
+        let lower: Bit.Index = 3
+        let upper: Bit.Index = 7
+        bits.set.range(lower ..< upper)
+
+        #expect(bits[2] == false)
+        #expect(bits[3] == true)
+        #expect(bits[4] == true)
+        #expect(bits[5] == true)
+        #expect(bits[6] == true)
+        #expect(bits[7] == false)
+
+        let expectedPopcount: Bit.Index.Count = 4
+        #expect(bits.popcount == expectedPopcount)
+    }
+
+    @Test("set.range multi word")
+    func setRangeMultiWord() {
+        var bits = Bit.Vector.Static<4>()
+        let lower: Bit.Index = 60
+        let upper: Bit.Index = 130
+        bits.set.range(lower ..< upper)
+
+        #expect(bits[59] == false)
+        #expect(bits[60] == true)
+        #expect(bits[64] == true)
+        #expect(bits[100] == true)
+        #expect(bits[129] == true)
+        #expect(bits[130] == false)
+
+        let expectedPopcount: Bit.Index.Count = 70
+        #expect(bits.popcount == expectedPopcount)
+    }
+
+    @Test("set.range empty range")
+    func setRangeEmpty() {
+        var bits = Bit.Vector.Static<4>()
+        let lower: Bit.Index = 5
+        bits.set.range(lower ..< lower)
+        #expect(bits.isEmpty == true)
+    }
+
+    @Test("set.range full word boundary")
+    func setRangeWordBoundary() {
+        var bits = Bit.Vector.Static<4>()
+        let lower: Bit.Index = 0
+        let upper: Bit.Index = 64
+        bits.set.range(lower ..< upper)
+
+        let expectedPopcount: Bit.Index.Count = 64
+        #expect(bits.popcount == expectedPopcount)
+        #expect(bits[0] == true)
+        #expect(bits[63] == true)
+        #expect(bits[64] == false)
+    }
+
+    @Test("clear.range single word")
+    func clearRangeSingleWord() {
+        var bits = Bit.Vector.Static<4>()
+        bits.set.all()
+
+        let lower: Bit.Index = 10
+        let upper: Bit.Index = 20
+        bits.clear.range(lower ..< upper)
+
+        #expect(bits[9] == true)
+        #expect(bits[10] == false)
+        #expect(bits[19] == false)
+        #expect(bits[20] == true)
+
+        let expectedPopcount: Bit.Index.Count = 246
+        #expect(bits.popcount == expectedPopcount)
+    }
+
+    @Test("clear.range multi word")
+    func clearRangeMultiWord() {
+        var bits = Bit.Vector.Static<4>()
+        bits.set.all()
+
+        let lower: Bit.Index = 60
+        let upper: Bit.Index = 130
+        bits.clear.range(lower ..< upper)
+
+        #expect(bits[59] == true)
+        #expect(bits[60] == false)
+        #expect(bits[100] == false)
+        #expect(bits[129] == false)
+        #expect(bits[130] == true)
+
+        let expectedPopcount: Bit.Index.Count = 186
+        #expect(bits.popcount == expectedPopcount)
+    }
+
+    @Test("set.range then clear.range roundtrip")
+    func setThenClearRoundtrip() {
+        var bits = Bit.Vector.Static<4>()
+        let lower: Bit.Index = 0
+        let upper: Bit.Index = 100
+        bits.set.range(lower ..< upper)
+
+        let expectedPopcount: Bit.Index.Count = 100
+        #expect(bits.popcount == expectedPopcount)
+
+        bits.clear.range(lower ..< upper)
+        #expect(bits.isEmpty == true)
+    }
+
+    @Test("set.range single bit")
+    func setRangeSingleBit() {
+        var bits = Bit.Vector.Static<4>()
+        let lower: Bit.Index = 42
+        let upper: Bit.Index = 43
+        bits.set.range(lower ..< upper)
+
+        #expect(bits[41] == false)
+        #expect(bits[42] == true)
+        #expect(bits[43] == false)
+
+        let expectedPopcount: Bit.Index.Count = 1
+        #expect(bits.popcount == expectedPopcount)
+    }
+
+    @Test("set.range preserves existing bits")
+    func setRangePreservesExisting() {
+        var bits = Bit.Vector.Static<4>()
+        bits[0] = true
+        bits[200] = true
+
+        let lower: Bit.Index = 10
+        let upper: Bit.Index = 20
+        bits.set.range(lower ..< upper)
+
+        #expect(bits[0] == true)
+        #expect(bits[200] == true)
+
+        let expectedPopcount: Bit.Index.Count = 12
+        #expect(bits.popcount == expectedPopcount)
+    }
 }
