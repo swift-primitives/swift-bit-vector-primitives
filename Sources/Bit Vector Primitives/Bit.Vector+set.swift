@@ -10,6 +10,8 @@
 // ===----------------------------------------------------------------------===//
 
 import Property_Primitives
+import Range_Primitives
+import Affine_Primitives
 
 extension Bit.Vector {
     @inlinable
