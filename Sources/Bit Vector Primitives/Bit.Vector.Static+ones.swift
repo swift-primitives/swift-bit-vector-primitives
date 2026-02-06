@@ -9,28 +9,14 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Property_Primitives
-
 extension Bit.Vector.Static {
-    @inlinable
-    public var ones: Property<Bit.Vector.Ones, Self> {
-        Property(self)
-    }
-}
-
-extension Property where Tag == Bit.Vector.Ones {
-    /// Calls the closure for each index where the bit is set.
+    /// A sequence of set-bit indices.
     ///
-    /// - Parameter body: A closure that receives each set bit's index.
-    /// - Complexity: O(popcount) — only visits set bits.
+    /// Returns a `Bit.Vector.Ones.Static` that copies the inline storage
+    /// and conforms to `Swift.Sequence`, providing `forEach`, `map`,
+    /// `filter`, `for-in`, and all stdlib sequence algorithms.
     @inlinable
-    public func forEach<let wordCount: Int>(_ body: (Bit.Index) -> Void) where Base == Bit.Vector.Static<wordCount> {
-        for wordIndex in 0..<wordCount {
-            let wordBase = Bit.Index(__unchecked: (), Ordinal((Index_Primitives.Index<UInt>.Count(Cardinal(UInt(wordIndex))) * .bitsPerWord).rawValue))
-            base._storage[wordIndex].set.forEach { bitIndex in
-                let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
-                body(globalIndex)
-            }
-        }
+    public var ones: Bit.Vector.Ones.Static<wordCount> {
+        Bit.Vector.Ones.Static<wordCount>(storage: _storage)
     }
 }

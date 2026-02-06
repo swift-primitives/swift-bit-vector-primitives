@@ -22,21 +22,3 @@ extension Bit.Vector {
     }
 }
 
-extension Bit.Vector.Ones.View {
-    /// Calls the closure for each index where the bit is set.
-    ///
-    /// - Parameter body: A closure that receives each set bit's index.
-    /// - Complexity: O(popcount) — only visits set bits.
-    @inlinable
-    public func forEach(_ body: (Bit.Index) -> Void) {
-        (.zero..<_wordCount).forEach { wordIndex in
-            let wordBase = Bit.Index(__unchecked: (), Ordinal((Index_Primitives.Index<UInt>.Count(wordIndex) * .bitsPerWord).rawValue))
-            unsafe _words[wordIndex].set.forEach { bitIndex in
-                let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitIndex)))
-                if globalIndex < _capacity {
-                    body(globalIndex)
-                }
-            }
-        }
-    }
-}
