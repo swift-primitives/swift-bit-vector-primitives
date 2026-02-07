@@ -49,11 +49,9 @@ extension Bit.Vector.Ones.Static {
             let bitPosition = _currentWord.trailingZeroBitCount
             _currentWord &= _currentWord &- 1
 
-            let globalBit = _wordIndex * UInt.bitWidth + bitPosition
-            return Bit.Index(
-                __unchecked: (),
-                Ordinal(UInt(globalBit))
-            )
+            let wordCount = Index_Primitives.Index<UInt>.Count(Cardinal(UInt(_wordIndex)))
+            let baseBitCount = wordCount * .bitsPerWord
+            return baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
         }
     }
 }

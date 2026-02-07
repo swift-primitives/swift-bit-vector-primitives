@@ -53,10 +53,7 @@ extension Bit.Vector.Ones.View {
         public mutating func next() -> Bit.Index? {
             // Advance to next word with set bits
             while _currentWord == 0 {
-                let next = Index_Primitives.Index<UInt>(
-                    __unchecked: (),
-                    Ordinal(_wordIndex.rawValue.rawValue &+ 1)
-                )
+                let next = _wordIndex.successor.saturating()
                 guard next < _wordCount else { return nil }
                 _wordIndex = next
                 unsafe _currentWord = _words[_wordIndex]
@@ -66,14 +63,10 @@ extension Bit.Vector.Ones.View {
             let bitPosition = _currentWord.trailingZeroBitCount
             _currentWord &= _currentWord &- 1
 
-            // Compute global bit index
-            let wordBase = Bit.Index(
-                __unchecked: (),
-                Ordinal(
-                    (Index_Primitives.Index<UInt>.Count(_wordIndex) * .bitsPerWord).rawValue
-                )
-            )
-            let globalIndex = wordBase + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+            // Compute global bit index via pack location
+            let wordAsCount = Index_Primitives.Index<UInt>.Count(_wordIndex)
+            let baseBitCount = wordAsCount * .bitsPerWord
+            let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
 
             guard globalIndex < _capacity else { return nil }
             return globalIndex

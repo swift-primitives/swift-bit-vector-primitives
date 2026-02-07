@@ -23,19 +23,18 @@ extension Property.View where Tag == Bit.Vector.Clear {
     public func range<let wordCount: Int>(
         _ range: Swift.Range<Bit.Index>
     ) where Base == Bit.Vector.Static<wordCount> {
-        let startRaw = Int(bitPattern: range.lowerBound.rawValue.rawValue)
-        let endRaw = Int(bitPattern: range.upperBound.rawValue.rawValue)
-        guard endRaw > startRaw else { return }
+        guard range.upperBound > range.lowerBound else { return }
 
-        let bitsPerWord = UInt.bitWidth
-        let startWord = startRaw / bitsPerWord
-        let startBit = startRaw % bitsPerWord
-        let lastBit = endRaw - 1
-        let endWord = lastBit / bitsPerWord
-        let endBit = lastBit % bitsPerWord
+        let startLoc = Bit.Pack<UInt>.Location(index: range.lowerBound, bitsPerWord: .bitsPerWord)
+        let lastIndex = Bit.Index(Ordinal(range.upperBound.rawValue.rawValue &- 1))
+        let endLoc = Bit.Pack<UInt>.Location(index: lastIndex, bitsPerWord: .bitsPerWord)
+        let startWord = Int(bitPattern: startLoc.word)
+        let startBit = Int(bitPattern: startLoc.bit)
+        let endWord = Int(bitPattern: endLoc.word)
+        let endBit = Int(bitPattern: endLoc.bit)
 
         let lowMask: UInt = ~0 << startBit
-        let highMask: UInt = ~0 >> (bitsPerWord - 1 - endBit)
+        let highMask: UInt = ~0 >> (UInt.bitWidth - 1 - endBit)
 
         if startWord == endWord {
             unsafe base.pointee._storage[startWord] &= ~(lowMask & highMask)
