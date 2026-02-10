@@ -62,15 +62,14 @@ extension Bit.Vector.Static {
     public subscript(index: Bit.Index) -> Bool {
         get {
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
-            return (_storage[Int(bitPattern: location.word)] & location.mask) != 0
+            return (_storage[location.word] & location.mask) != 0
         }
         set {
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
-            let word = Int(bitPattern: location.word)
             if newValue {
-                _storage[word] |= location.mask
+                _storage[location.word] |= location.mask
             } else {
-                _storage[word] &= ~location.mask
+                _storage[location.word] &= ~location.mask
             }
         }
     }

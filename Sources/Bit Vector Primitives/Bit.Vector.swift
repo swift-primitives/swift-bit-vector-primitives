@@ -35,11 +35,13 @@ extension Bit {
     /// if bits[Bit.Index(42)] { ... }
     /// ```
     ///
-    /// ## Relationship to Set/Array
+    /// ## Variants
     ///
-    /// For set semantics (membership, algebra), use `Set<Bit>.Vector`.
-    /// For array semantics (count, append), use `Array<Bit>.Vector`.
-    /// Those types wrap `Bit.Vector` with their respective semantics.
+    /// - ``Bit.Vector``: Fixed-capacity, ~Copyable infrastructure bitmap (this type)
+    /// - ``Bit.Vector.Static``: Fixed-capacity inline bitmap (Copyable, no count tracking)
+    /// - ``Bit.Vector.Dynamic``: Growable packed bit array (Copyable, heap-allocated)
+    /// - ``Bit.Vector.Bounded``: Fixed-capacity packed bit array (Copyable, heap-allocated)
+    /// - ``Bit.Vector.Inline``: Fixed-capacity inline bit array (Copyable, stack-allocated)
     @safe
     public struct Vector: ~Copyable {
         @usableFromInline

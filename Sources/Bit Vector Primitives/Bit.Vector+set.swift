@@ -10,7 +10,7 @@
 // ===----------------------------------------------------------------------===//
 
 import Property_Primitives
-import Range_Primitives
+import Vector_Primitives
 import Affine_Primitives
 
 extension Bit.Vector {
