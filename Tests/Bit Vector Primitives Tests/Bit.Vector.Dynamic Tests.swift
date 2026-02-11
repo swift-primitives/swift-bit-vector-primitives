@@ -124,7 +124,8 @@ extension BitVectorDynamicTests.Unit {
         let bits = Bit.Vector.Dynamic(repeating: true, count: 5)
 
         #expect(bits.count == 5)
-        for i in (0..<5).map(Bit.Index.init) {
+        for n in 0..<5 {
+            let i: Bit.Index = Bit.Index(integerLiteral: UInt(n))
             #expect(bits[i] == true)
         }
     }
@@ -134,7 +135,8 @@ extension BitVectorDynamicTests.Unit {
         let bits = Bit.Vector.Dynamic(repeating: false, count: 5)
 
         #expect(bits.count == 5)
-        for i in (0..<5).map(Bit.Index.init) {
+        for n in 0..<5 {
+            let i: Bit.Index = Bit.Index(integerLiteral: UInt(n))
             #expect(bits[i] == false)
         }
     }

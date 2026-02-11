@@ -96,7 +96,7 @@ extension Bit.Vector.Dynamic {
         if fill && newCount > _count && oldWordCount > 0 {
             let oldLoc = Bit.Pack<UInt>.Location(count: _count, bitsPerWord: .bitsPerWord)
             if oldLoc.bit > .zero && oldLoc.word < newPack.words.count {
-                let highMask: UInt = ~0 << Int(bitPattern: oldLoc.bit)
+                let highMask: UInt = ~0 << oldLoc.bit.magnitude
                 _storage[oldLoc.word] |= highMask
             }
         }
@@ -105,7 +105,7 @@ extension Bit.Vector.Dynamic {
 
         if newWordCount > 0 && newPack.bits.unused > .zero {
             let lastWord = newWordCount - 1
-            let mask: UInt = ~0 >> Int(bitPattern: newPack.bits.unused)
+            let mask: UInt = ~0 >> newPack.bits.unused
             _storage[lastWord] &= mask
         }
     }

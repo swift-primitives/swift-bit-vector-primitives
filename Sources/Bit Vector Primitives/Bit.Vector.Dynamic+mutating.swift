@@ -61,7 +61,7 @@ extension Bit.Vector.Dynamic {
         let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
         if pack.bits.unused > .zero && !_storage.isEmpty {
             let lastWord = _storage.count - 1
-            let mask: UInt = ~0 >> Int(bitPattern: pack.bits.unused)
+            let mask: UInt = ~0 >> pack.bits.unused
             _storage[lastWord] = mask
         }
     }

@@ -29,11 +29,13 @@ extension Bit.Vector.Dynamic {
     @inlinable
     public init<let wordCount: Int>(_ inline: Bit.Vector.Inline<wordCount>) {
         let pack = Bit.Pack<UInt>(count: inline._count, bitsPerWord: .bitsPerWord)
-        let wordCountInt = Int(bitPattern: pack.words.count)
+        let end = pack.words.count.map(Ordinal.init)
         self._storage = ContiguousArray<UInt>()
-        self._storage.reserveCapacity(wordCountInt)
-        for i in 0..<wordCountInt {
-            self._storage.append(inline._storage[i])
+        self._storage.reserveCapacity(Int(bitPattern: pack.words.count))
+        var w: Index<UInt> = .zero
+        while w < end {
+            self._storage.append(inline._storage[w])
+            w += .one
         }
         self._count = inline._count
     }

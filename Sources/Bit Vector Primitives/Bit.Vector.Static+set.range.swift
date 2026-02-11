@@ -27,11 +27,13 @@ extension Property.View where Tag == Bit.Vector.Set {
 
         let startLoc = Bit.Pack<UInt>.Location(index: range.lowerBound, bitsPerWord: .bitsPerWord)
         let endLoc = Bit.Pack<UInt>.Location(index: try! range.upperBound.predecessor.exact(), bitsPerWord: .bitsPerWord)
-        let startBit = Int(bitPattern: startLoc.bit)
-        let endBit = Int(bitPattern: endLoc.bit)
+        let startBit = startLoc.bit.magnitude
+        let endBit = endLoc.bit.magnitude
 
         let lowMask: UInt = ~0 << startBit
-        let highMask: UInt = ~0 >> (UInt.bitWidth - 1 - endBit)
+        let maxBitIndex = try! Bit.Pack<UInt>.bitWidth.subtract.exact(.one)
+        let highShift = try! maxBitIndex.subtract.exact(endBit)
+        let highMask: UInt = ~0 >> highShift
 
         if startLoc.word == endLoc.word {
             unsafe base.pointee._storage[startLoc.word] |= (lowMask & highMask)

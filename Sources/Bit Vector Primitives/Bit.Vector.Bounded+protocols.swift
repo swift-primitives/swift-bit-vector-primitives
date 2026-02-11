@@ -16,9 +16,11 @@ extension Bit.Vector.Bounded: Equatable {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs._count == rhs._count else { return false }
         let pack = Bit.Pack<UInt>(count: lhs._count, bitsPerWord: .bitsPerWord)
-        let wordCount = Int(bitPattern: pack.words.count)
-        for i in 0..<wordCount {
-            if lhs._storage[i] != rhs._storage[i] { return false }
+        let end = pack.words.count.map(Ordinal.init)
+        var w: Index<UInt> = .zero
+        while w < end {
+            if lhs._storage[w] != rhs._storage[w] { return false }
+            w += .one
         }
         return true
     }
@@ -30,10 +32,12 @@ extension Bit.Vector.Bounded: Hashable {
     @inlinable
     public func hash(into hasher: inout Hasher) {
         let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
-        let wordCount = Int(bitPattern: pack.words.count)
+        let end = pack.words.count.map(Ordinal.init)
         hasher.combine(_count)
-        for i in 0..<wordCount {
-            hasher.combine(_storage[i])
+        var w: Index<UInt> = .zero
+        while w < end {
+            hasher.combine(_storage[w])
+            w += .one
         }
     }
 }

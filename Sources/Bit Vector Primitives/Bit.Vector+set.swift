@@ -40,7 +40,7 @@ extension Property.View where Tag == Bit.Vector.Set, Base == Bit.Vector {
         let unused = pack.bits.unused
         if unused > .zero && wordCount > .zero {
             let location = Bit.Pack<UInt>.Location(count: unsafe base.pointee.capacity, bitsPerWord: .bitsPerWord)
-            let mask = UInt.max >> Int(bitPattern: unused)
+            let mask = UInt.max >> unused
             let current = unsafe base.pointee._words[location.word]
             unsafe base.pointee._words[location.word] = current & mask
         }

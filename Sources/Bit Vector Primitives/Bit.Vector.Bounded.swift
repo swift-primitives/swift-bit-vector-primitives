@@ -85,8 +85,8 @@ extension Bit.Vector {
             if value && count > .zero {
                 let countPack = Bit.Pack<UInt>(count: count, bitsPerWord: .bitsPerWord)
                 if countPack.bits.unused > .zero {
-                    let lastWord = Int(bitPattern: countPack.words.count) - 1
-                    let mask: UInt = ~0 >> Int(bitPattern: countPack.bits.unused)
+                    let lastWord = try! countPack.words.count.map(Ordinal.init).predecessor.exact()
+                    let mask: UInt = ~0 >> countPack.bits.unused
                     _storage[lastWord] = mask
                 }
                 // Clear words beyond count

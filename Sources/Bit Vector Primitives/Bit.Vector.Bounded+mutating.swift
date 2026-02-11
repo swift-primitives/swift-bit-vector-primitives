@@ -56,13 +56,15 @@ extension Bit.Vector.Bounded {
     @inlinable
     public mutating func setAll() {
         let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
-        let wordCount = Int(bitPattern: pack.words.count)
-        for i in 0..<wordCount {
-            _storage[i] = ~0
+        let end = pack.words.count.map(Ordinal.init)
+        var w: Index<UInt> = .zero
+        while w < end {
+            _storage[w] = ~0
+            w += .one
         }
-        if pack.bits.unused > .zero && wordCount > 0 {
-            let lastWord = wordCount - 1
-            let mask: UInt = ~0 >> Int(bitPattern: pack.bits.unused)
+        if pack.bits.unused > .zero && pack.words.count > .zero {
+            let lastWord = try! end.predecessor.exact()
+            let mask: UInt = ~0 >> pack.bits.unused
             _storage[lastWord] = mask
         }
     }

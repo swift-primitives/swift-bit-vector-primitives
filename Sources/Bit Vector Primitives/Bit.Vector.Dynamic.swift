@@ -66,7 +66,7 @@ extension Bit.Vector {
 
             if value && count > .zero && pack.bits.unused > .zero {
                 let lastWord = _storage.count - 1
-                let mask: UInt = ~0 >> Int(bitPattern: pack.bits.unused)
+                let mask: UInt = ~0 >> pack.bits.unused
                 _storage[lastWord] = mask
             }
         }
