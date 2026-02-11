@@ -40,7 +40,7 @@ extension Bit.Vector {
         public init(capacity: Bit.Index.Count) {
             let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
             self._capacity = capacity
-            self._storage = ContiguousArray(repeating: 0, count: Int(bitPattern: pack.words.count))
+            self._storage = ContiguousArray(repeating: 0, count: pack.words.count)
             self._count = .zero
         }
 
@@ -54,7 +54,7 @@ extension Bit.Vector {
             }
             let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
             self._capacity = capacity
-            self._storage = ContiguousArray(repeating: 0, count: Int(bitPattern: pack.words.count))
+            self._storage = ContiguousArray(repeating: 0, count: pack.words.count)
             self._count = count
         }
 
@@ -78,9 +78,8 @@ extension Bit.Vector {
                 throw .overflow
             }
             let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
-            let wordCount = Int(bitPattern: pack.words.count)
             self._capacity = capacity
-            self._storage = ContiguousArray(repeating: value ? ~0 : 0, count: wordCount)
+            self._storage = ContiguousArray(repeating: value ? ~0 : 0, count: pack.words.count)
             self._count = count
 
             if value && count > .zero {
@@ -92,7 +91,7 @@ extension Bit.Vector {
                 }
                 // Clear words beyond count
                 let countWords = Int(bitPattern: countPack.words.count)
-                for i in countWords..<wordCount {
+                for i in countWords..<_storage.count {
                     _storage[i] = 0
                 }
             }
@@ -122,10 +121,8 @@ extension Bit.Vector.Bounded {
     @inlinable
     public var popcount: Bit.Index.Count {
         var total: UInt = 0
-        let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
-        let wordCount = Int(bitPattern: pack.words.count)
-        for i in 0..<wordCount {
-            total += UInt(_storage[i].nonzeroBitCount)
+        for word in _storage {
+            total += UInt(word.nonzeroBitCount)
         }
         return Bit.Index.Count(Cardinal(total))
     }

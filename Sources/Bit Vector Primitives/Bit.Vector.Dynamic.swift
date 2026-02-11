@@ -53,8 +53,7 @@ extension Bit.Vector {
         @inlinable
         public init(count: Bit.Index.Count) {
             let pack = Bit.Pack<UInt>(count: count, bitsPerWord: .bitsPerWord)
-            let wordCount = Int(bitPattern: pack.words.count)
-            self._storage = ContiguousArray(repeating: 0, count: wordCount)
+            self._storage = ContiguousArray(repeating: 0, count: pack.words.count)
             self._count = count
         }
 
@@ -62,12 +61,11 @@ extension Bit.Vector {
         @inlinable
         public init(repeating value: Bool, count: Bit.Index.Count) {
             let pack = Bit.Pack<UInt>(count: count, bitsPerWord: .bitsPerWord)
-            let wordCount = Int(bitPattern: pack.words.count)
-            self._storage = ContiguousArray(repeating: value ? ~0 : 0, count: wordCount)
+            self._storage = ContiguousArray(repeating: value ? ~0 : 0, count: pack.words.count)
             self._count = count
 
             if value && count > .zero && pack.bits.unused > .zero {
-                let lastWord = wordCount - 1
+                let lastWord = _storage.count - 1
                 let mask: UInt = ~0 >> Int(bitPattern: pack.bits.unused)
                 _storage[lastWord] = mask
             }

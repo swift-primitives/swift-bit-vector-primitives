@@ -112,9 +112,7 @@ extension Bit.Vector.Inline {
     @inlinable
     public var popcount: Bit.Index.Count {
         var total: UInt = 0
-        let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
-        let wordCountInt = Int(bitPattern: pack.words.count)
-        for i in 0..<wordCountInt {
+        for i in 0..<wordCount {
             total += UInt(_storage[i].nonzeroBitCount)
         }
         return Bit.Index.Count(Cardinal(total))

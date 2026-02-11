@@ -26,24 +26,23 @@ extension Property.View where Tag == Bit.Vector.Clear {
         guard range.upperBound > range.lowerBound else { return }
 
         let startLoc = Bit.Pack<UInt>.Location(index: range.lowerBound, bitsPerWord: .bitsPerWord)
-        let lastIndex = Bit.Index(Ordinal(range.upperBound.rawValue.rawValue &- 1))
-        let endLoc = Bit.Pack<UInt>.Location(index: lastIndex, bitsPerWord: .bitsPerWord)
-        let startWord = Int(bitPattern: startLoc.word)
+        let endLoc = Bit.Pack<UInt>.Location(index: try! range.upperBound.predecessor.exact(), bitsPerWord: .bitsPerWord)
         let startBit = Int(bitPattern: startLoc.bit)
-        let endWord = Int(bitPattern: endLoc.word)
         let endBit = Int(bitPattern: endLoc.bit)
 
         let lowMask: UInt = ~0 << startBit
         let highMask: UInt = ~0 >> (UInt.bitWidth - 1 - endBit)
 
-        if startWord == endWord {
-            unsafe base.pointee._storage[startWord] &= ~(lowMask & highMask)
+        if startLoc.word == endLoc.word {
+            unsafe base.pointee._storage[startLoc.word] &= ~(lowMask & highMask)
         } else {
-            unsafe base.pointee._storage[startWord] &= ~lowMask
-            for w in (startWord + 1)..<endWord {
+            unsafe base.pointee._storage[startLoc.word] &= ~lowMask
+            var w = startLoc.word + Index<UInt>.Count.one
+            while w < endLoc.word {
                 unsafe base.pointee._storage[w] = 0
+                w = w + Index<UInt>.Count.one
             }
-            unsafe base.pointee._storage[endWord] &= ~highMask
+            unsafe base.pointee._storage[endLoc.word] &= ~highMask
         }
     }
 }

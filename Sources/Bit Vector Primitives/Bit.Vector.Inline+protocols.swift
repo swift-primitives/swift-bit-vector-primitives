@@ -15,9 +15,7 @@ extension Bit.Vector.Inline: Equatable {
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs._count == rhs._count else { return false }
-        let pack = Bit.Pack<UInt>(count: lhs._count, bitsPerWord: .bitsPerWord)
-        let wordCountInt = Int(bitPattern: pack.words.count)
-        for i in 0..<wordCountInt {
+        for i in 0..<wordCount {
             if lhs._storage[i] != rhs._storage[i] { return false }
         }
         return true
@@ -29,10 +27,8 @@ extension Bit.Vector.Inline: Equatable {
 extension Bit.Vector.Inline: Hashable {
     @inlinable
     public func hash(into hasher: inout Hasher) {
-        let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
-        let wordCountInt = Int(bitPattern: pack.words.count)
         hasher.combine(_count)
-        for i in 0..<wordCountInt {
+        for i in 0..<wordCount {
             hasher.combine(_storage[i])
         }
     }
