@@ -15,23 +15,27 @@ import Property_Primitives
 
 extension Bit.Vector.Inline {
     /// Tag type for `statistic.true`/`statistic.false` property accessors.
-    public enum Statistic: Sendable {}
+    public enum Statistic: Sendable {
+        public typealias View = Property<Statistic, Bit.Vector.Inline<wordCount>>.View.Typed<Bit>.Valued<wordCount>
+    }
 
     /// Tag type for `all.true`/`all.false` property accessors.
-    public enum All: Sendable {}
+    public enum All: Sendable {
+        public typealias View = Property<All, Bit.Vector.Inline<wordCount>>.View.Typed<Bit>.Valued<wordCount>
+    }
 
     /// Tag type for `capacity.maximum`/`capacity.remaining` property accessors.
-    public enum Capacity: Sendable {}
+    public enum Capacity: Sendable {
+        public typealias View = Property<Capacity, Bit.Vector.Inline<wordCount>>.View.Typed<Bit>.Valued<wordCount>
+    }
 }
 
 // MARK: - Property: statistic.true / statistic.false
 
 extension Bit.Vector.Inline {
     @inlinable
-    public var statistic: Property<Statistic, Self>.View.Typed<Bit>.Valued<wordCount> {
-        mutating _read {
-            yield unsafe Property<Statistic, Self>.View.Typed<Bit>.Valued<wordCount>(&self)
-        }
+    public var statistic: Statistic.View {
+        mutating _read { yield unsafe .init(&self) }
     }
 }
 
@@ -50,10 +54,8 @@ where Tag == Bit.Vector.Inline<n>.Statistic, Base == Bit.Vector.Inline<n>, Eleme
 
 extension Bit.Vector.Inline {
     @inlinable
-    public var all: Property<All, Self>.View.Typed<Bit>.Valued<wordCount> {
-        mutating _read {
-            yield unsafe Property<All, Self>.View.Typed<Bit>.Valued<wordCount>(&self)
-        }
+    public var all: All.View {
+        mutating _read { yield unsafe .init(&self) }
     }
 }
 
@@ -78,10 +80,8 @@ where Tag == Bit.Vector.Inline<n>.All, Base == Bit.Vector.Inline<n>, Element == 
 
 extension Bit.Vector.Inline {
     @inlinable
-    public var capacity: Property<Capacity, Self>.View.Typed<Bit>.Valued<wordCount> {
-        mutating _read {
-            yield unsafe Property<Capacity, Self>.View.Typed<Bit>.Valued<wordCount>(&self)
-        }
+    public var capacity: Capacity.View {
+        mutating _read { yield unsafe .init(&self) }
     }
 }
 
