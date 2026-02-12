@@ -50,25 +50,6 @@ extension Property.View where Tag == Bit.Vector.Dynamic.Toggle, Base == Bit.Vect
 
 // MARK: - Property: set.returning
 
-extension Bit.Vector.Dynamic {
-    /// Property view for set operations with return values.
-    ///
-    /// ```swift
-    /// var bits = Bit.Vector.Dynamic([false, false, false])
-    /// let previous = try bits.set.returning(1)  // false
-    /// ```
-    @inlinable
-    public var `set`: Property<Bit.Vector.Set, Self>.View {
-        mutating _read {
-            yield unsafe Property<Bit.Vector.Set, Self>.View(&self)
-        }
-        mutating _modify {
-            var view = unsafe Property<Bit.Vector.Set, Self>.View(&self)
-            yield &view
-        }
-    }
-}
-
 extension Property.View where Tag == Bit.Vector.Set, Base == Bit.Vector.Dynamic {
     /// Sets the bit at index and returns the previous value.
     @inlinable
@@ -80,25 +61,6 @@ extension Property.View where Tag == Bit.Vector.Set, Base == Bit.Vector.Dynamic 
 }
 
 // MARK: - Property: clear.returning
-
-extension Bit.Vector.Dynamic {
-    /// Property view for clear operations with return values.
-    ///
-    /// ```swift
-    /// var bits = Bit.Vector.Dynamic([true, true, true])
-    /// let previous = try bits.clear.returning(1)  // true
-    /// ```
-    @inlinable
-    public var clear: Property<Bit.Vector.Clear, Self>.View {
-        mutating _read {
-            yield unsafe Property<Bit.Vector.Clear, Self>.View(&self)
-        }
-        mutating _modify {
-            var view = unsafe Property<Bit.Vector.Clear, Self>.View(&self)
-            yield &view
-        }
-    }
-}
 
 extension Property.View where Tag == Bit.Vector.Clear, Base == Bit.Vector.Dynamic {
     /// Clears the bit at index and returns the previous value.
