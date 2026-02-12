@@ -12,25 +12,30 @@
 import Property_Primitives
 
 extension Bit.Vector.Bounded {
-    /// Tag type for `statistic.true`/`statistic.false` property accessors.
-    public enum Statistic: Sendable {}
+    /// Tag type for `all.true`/`all.false` property accessors.
+    public enum All: Sendable {}
 }
 
-// MARK: - Property: statistic.true / statistic.false
+// MARK: - Property: all.true / all.false
 
 extension Bit.Vector.Bounded {
     @inlinable
-    public var statistic: Property<Statistic, Self> {
+    public var all: Property<All, Self> {
         Property(self)
     }
 }
 
-extension Property where Tag == Bit.Vector.Bounded.Statistic, Base == Bit.Vector.Bounded {
-    /// The number of `true` bits.
+extension Property where Tag == Bit.Vector.Bounded.All, Base == Bit.Vector.Bounded {
+    /// Whether all bits are `true`.
     @inlinable
-    public var `true`: Bit.Index.Count { base.popcount }
+    public var `true`: Bool {
+        guard base._count > .zero else { return true }
+        return base.popcount == base._count
+    }
 
-    /// The number of `false` bits.
+    /// Whether all bits are `false`.
     @inlinable
-    public var `false`: Bit.Index.Count { base._count.subtract.saturating(base.popcount) }
+    public var `false`: Bool {
+        base.popcount == .zero
+    }
 }

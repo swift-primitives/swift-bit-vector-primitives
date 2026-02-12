@@ -12,25 +12,25 @@
 import Property_Primitives
 
 extension Bit.Vector.Bounded {
-    /// Tag type for `statistic.true`/`statistic.false` property accessors.
-    public enum Statistic: Sendable {}
+    /// Tag type for `capacity.maximum`/`capacity.remaining` property accessors.
+    public enum Capacity: Sendable {}
 }
 
-// MARK: - Property: statistic.true / statistic.false
+// MARK: - Property: capacity.maximum / capacity.remaining
 
 extension Bit.Vector.Bounded {
     @inlinable
-    public var statistic: Property<Statistic, Self> {
+    public var capacity: Property<Capacity, Self> {
         Property(self)
     }
 }
 
-extension Property where Tag == Bit.Vector.Bounded.Statistic, Base == Bit.Vector.Bounded {
-    /// The number of `true` bits.
+extension Property where Tag == Bit.Vector.Bounded.Capacity, Base == Bit.Vector.Bounded {
+    /// The maximum number of bits.
     @inlinable
-    public var `true`: Bit.Index.Count { base.popcount }
+    public var maximum: Bit.Index.Count { base._capacity }
 
-    /// The number of `false` bits.
+    /// The number of remaining slots.
     @inlinable
-    public var `false`: Bit.Index.Count { base._count.subtract.saturating(base.popcount) }
+    public var remaining: Bit.Index.Count { base._capacity.subtract.saturating(base._count) }
 }
