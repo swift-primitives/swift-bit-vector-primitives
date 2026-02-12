@@ -78,34 +78,12 @@ extension Bit.Vector.Static {
 // MARK: - Bulk Operations
 
 extension Bit.Vector.Static {
-    /// The number of bits set to true.
-    ///
-    /// - Complexity: O(wordCount) using hardware popcount.
-    @inlinable
-    public var popcount: Bit.Index.Count {
-        var count: UInt = 0
-        for i in 0..<wordCount {
-            count += UInt(_storage[i].nonzeroBitCount)
-        }
-        return Bit.Index.Count(Cardinal(count))
-    }
-
     /// Whether all bits are false.
     @inlinable
-    public var isEmpty: Bool {
-        for i in 0..<wordCount {
-            if _storage[i] != 0 { return false }
-        }
-        return true
-    }
+    public var isEmpty: Bool { allFalse }
 
     /// Whether all bits are true.
     @inlinable
-    public var isFull: Bool {
-        for i in 0..<wordCount {
-            if _storage[i] != ~0 { return false }
-        }
-        return true
-    }
+    public var isFull: Bool { allTrue }
 }
 

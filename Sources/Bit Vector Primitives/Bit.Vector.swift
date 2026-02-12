@@ -110,29 +110,13 @@ extension Bit.Vector {
 // MARK: - Bulk Operations
 
 extension Bit.Vector {
-    /// The number of bits set to true.
-    ///
-    /// - Complexity: O(n/64) using hardware popcount.
-    @inlinable
-    public var popcount: Bit.Index.Count {
-        var total: UInt = 0
-        (.zero..<_wordCount).forEach { i in
-            total += UInt(unsafe _words[i].nonzeroBitCount)
-        }
-        return Bit.Index.Count(Cardinal(total))
-    }
-
     /// Whether all bits are false.
     @inlinable
-    public var isEmpty: Bool {
-        !(.zero..<_wordCount).contains(where: { i in unsafe _words[i] != 0 })
-    }
+    public var isEmpty: Bool { allFalse }
 
     /// Whether all bits are true.
     @inlinable
-    public var isFull: Bool {
-        popcount == capacity
-    }
+    public var isFull: Bool { allTrue }
 }
 
 // MARK: - Word Access

@@ -207,135 +207,122 @@ Keep the current approach. When a variant lacks an operation, add it to that var
 
 ## Recommendation
 
-**Option C (Static Methods)** for the immediate term, with **Option B (Word-Access)** as the long-term target when `~Copyable` protocol support matures.
+**Option A: `Bit.Vector.Protocol`** — empirically validated via experiment.
 
-### Rationale
+### Experiment Results
 
-1. **Option C solves the acute problem now**: `pop.first()` can be implemented once as `Bit.Vector.popFirst(words:capacity:)` and called from every variant's wrapper. Same for `ones`, `isEmpty`, `isFull`, `popcount`, `clearAll`, `setAll`.
+`Experiments/bit-vector-protocol/` — **CONFIRMED** on Swift 6.2.3.
 
-2. **No compiler risk**: Static methods with `UnsafeBufferPointer<UInt>` avoid all `~Copyable` protocol limitations. Every variant already has word-level access internally (`_storage`, `_words`, `InlineArray`).
+A `~Copyable` protocol with word-level requirements and `where Self: ~Copyable` default extensions works today. All operations — `popcount`, `allFalse`, `allTrue`, `clearAll`, `setAll`, `popFirst` (Wegner/Kernighan), `ones` iterator — compile and run correctly across:
 
-3. **Zero performance cost**: `@inlinable` static methods with buffer pointer args compile to the same code as hand-written implementations.
+- ~Copyable types (stand-in for `Bit.Vector`)
+- Copyable types (stand-in for `Bit.Vector.Bounded`)
+- Value-generic types (stand-in for `Bit.Vector.Static<N>`)
+- Generic functions with `<V: BitVectorProtocol & ~Copyable>`
+- Borrowing generic functions for read-only access
 
-4. **Thin wrapper declarations are acceptable**: Each variant still declares `var popcount`, `func pop.first()`, etc., but the body is a single delegation call. This is ~3 lines per operation per variant vs ~10-20 lines of duplicated logic.
+**One compiler bug**: subscript get/set as a default implementation in a `where Self: ~Copyable` extension crashes with "copy of noncopyable typed value" internal error. **Workaround**: declare subscript as a protocol *requirement* instead of a default. Each conformer provides the 5-line subscript implementation. This is acceptable — subscript is the only operation that isn't fully defaulted.
 
-5. **Path to Option B**: When `~Copyable` protocols stabilize, the static methods become the default implementations of a `WordAccessible` protocol extension. The migration is additive — existing API doesn't change.
-
-### Implementation Sketch
-
-**Phase 1: Core static operations** (in `Bit Vector Primitives Core` or similar):
+### Protocol Shape
 
 ```swift
 extension Bit.Vector {
-    /// Counts set bits across word storage.
-    @inlinable
-    public static func popcount(
-        words: UnsafeBufferPointer<UInt>
-    ) -> Bit.Index.Count {
-        var total: UInt = 0
-        for word in words { total += UInt(word.nonzeroBitCount) }
-        return Bit.Index.Count(Cardinal(total))
-    }
-
-    /// Removes and returns the index of the lowest set bit (Wegner/Kernighan).
-    @inlinable
-    public static func popFirst(
-        words: UnsafeMutableBufferPointer<UInt>,
-        capacity: Bit.Index.Count
-    ) -> Bit.Index? {
-        for i in words.indices {
-            let word = words[i]
-            if word != 0 {
-                let bit = word.trailingZeroBitCount
-                words[i] = word & (word &- 1)
-                let globalIndex = Bit.Index.Count(UInt(i * UInt.bitWidth)) + Bit.Index.Count(UInt(bit))
-                let index = globalIndex.map(Ordinal.init)
-                guard index < capacity else { return nil }
-                return index
-            }
-        }
-        return nil
-    }
-
-    /// Whether all bits are false.
-    @inlinable
-    public static func allFalse(
-        words: UnsafeBufferPointer<UInt>
-    ) -> Bool {
-        for word in words { if word != 0 { return false } }
-        return true
-    }
-
-    /// Whether all bits (up to capacity) are true.
-    @inlinable
-    public static func allTrue(
-        words: UnsafeBufferPointer<UInt>,
-        capacity: Bit.Index.Count
-    ) -> Bool {
-        // Check full words are all-ones, last word has correct mask
-        ...
+    public protocol `Protocol`: ~Copyable {
+        var wordCount: Int { get }
+        var bitCapacity: Bit.Index.Count { get }
+        borrowing func word(at index: Int) -> UInt
+        mutating func setWord(at index: Int, to value: UInt)
+        subscript(index: Bit.Index) -> Bool { get set }  // requirement (compiler bug workaround)
     }
 }
 ```
 
-**Phase 2: Variant wrappers** — Each variant adds thin delegating implementations:
+**Default implementations** (via `extension Bit.Vector.Protocol where Self: ~Copyable`):
 
-```swift
-extension Bit.Vector.Bounded {
-    @inlinable
-    public var pop: Property<Bit.Vector.Pop, Self>.View {
-        mutating _read {
-            yield unsafe Property<Bit.Vector.Pop, Self>.View(&self)
-        }
-    }
-}
+| Operation | Category | Implementation |
+|-----------|----------|----------------|
+| `popcount` | Read-only | Hardware popcount per word |
+| `allFalse` | Read-only | Word scan for any nonzero |
+| `allTrue` | Read-only | Word scan with capacity mask |
+| `ones` | Read-only | Copies words, returns `OnesSequence` |
+| `clearAll()` | Mutating | Zero all words |
+| `setAll()` | Mutating | Set all words with capacity mask |
+| `popFirst()` | Mutating | Wegner/Kernighan lowest-bit extraction |
 
-extension Property.View where Tag == Bit.Vector.Pop, Base == Bit.Vector.Bounded {
-    @inlinable
-    public func first() -> Bit.Index? {
-        base.pointee._storage.withUnsafeMutableBufferPointer { words in
-            Bit.Vector.popFirst(words: words, capacity: base.pointee._capacity)
-        }
-    }
-}
-```
+**Per-conformer requirements** (4-5 declarations each):
 
-**Phase 3: Parity audit** — Ensure all 5 variants expose:
-- `subscript(index:)` get/set
-- `popcount`
-- `isEmpty` (popcount-based: "all bits false")
-- `isFull` (popcount-based: "all bits true up to capacity")
-- `ones` (iterator over set bits)
-- `zeros` (iterator over clear bits)
-- `pop.first()` (destructive lowest-bit extraction)
-- `take()` (ownership transfer)
-- `clear.all()` / `set.all()` (bulk mutation)
+| Requirement | Lines | Notes |
+|------------|-------|-------|
+| `wordCount` | 1 | Stored or computed |
+| `bitCapacity` | 1 | Stored or computed |
+| `word(at:)` | 1 | Delegate to backing storage |
+| `setWord(at:to:)` | 1 | Delegate to backing storage |
+| `subscript` | 5 | Compiler bug workaround |
 
-**Counted types** (Bounded, Inline, Dynamic) additionally expose `count`, `append`, `popLast`, etc. These are NOT shared — they're intrinsic to the counted-vector semantic.
+### Advantages Over Option C (Static Methods)
+
+The experiment proved Option A works today, making it strictly superior to Option C:
+
+1. **Compile-time parity enforcement** — adding a new default benefits all conformers automatically
+2. **Generic consumer code** — functions generic over `Bit.Vector.Protocol & ~Copyable` work
+3. **Semantic consistency** — `allFalse`/`allTrue` defined once with canonical semantics
+4. **Less code** — ~9 lines per conformer vs ~3 lines × N operations in Option C
+
+### Implementation Plan
+
+**Phase 1: Protocol definition** in `swift-bit-vector-primitives`:
+- Define `Bit.Vector.Protocol` with word-level requirements
+- Implement all default extensions
+
+**Phase 2: Conform existing types**:
+- `Bit.Vector` — conform, remove duplicated method bodies
+- `Bit.Vector.Bounded` — conform, remove duplicated method bodies
+- `Bit.Vector.Static<N>` — conform, remove duplicated method bodies
+- `Bit.Vector.Inline<N>` — conform, remove duplicated method bodies
+- `Bit.Vector.Dynamic` — conform, remove duplicated method bodies
+
+**Phase 3: Add missing operations**:
+- `pop.first()` (via Property.View pattern) on all variants — delegates to `popFirst()` from protocol
+- `zeros` iterator on variants that lack it
+
+**Phase 4: Update consumers**:
+- Buffer-primitives consume files: use `popFirst()` instead of linear scan
+- Resolve `isEmpty`/`isFull` semantic drift
 
 ### Semantic Clarification
 
-The parity audit should establish clear terminology:
+The protocol establishes canonical bitmap semantics:
 
 | Property | Meaning | All variants |
 |----------|---------|:------------:|
 | `popcount` | Number of true bits | Yes |
-| `isEmpty` | All bits are false (`popcount == .zero`) | Yes |
-| `isFull` | All bits are true up to capacity | Yes |
+| `allFalse` | All bits are false (`popcount == .zero`) | Yes |
+| `allTrue` | All bits are true up to capacity | Yes |
 | `count` | Number of appended bit positions | Counted types only |
 
-This resolves the semantic drift where `isEmpty` and `isFull` mean different things on counted vs. fixed types.
+Counted types (Bounded, Inline, Dynamic) retain their own `isEmpty`/`isFull` with count-based semantics. The protocol provides `allFalse`/`allTrue` with popcount-based semantics. No conflict — different names, different semantics.
+
+## Compiler Bug
+
+**Bug**: subscript get/set in `extension P where Self: ~Copyable` crashes with "copy of noncopyable typed value. This is a compiler bug."
+
+**Reproduction**: `Experiments/bit-vector-protocol/` — change subscript from requirement to default implementation.
+
+**Workaround**: Declare subscript as protocol requirement. Each conformer provides it.
+
+**Impact**: Minimal. One 5-line implementation per conformer. All other operations default correctly.
 
 ## Next Steps
 
-1. Implement Phase 1 static methods in `swift-bit-vector-primitives`
-2. Add `pop.first()` to `Bit.Vector.Bounded` (and all other variants) via Phase 2 wrappers
-3. Update buffer-primitives consume files to use `pop.first()` instead of linear scan
-4. Conduct parity audit (Phase 3) across all variants
-5. Track `~Copyable` protocol evolution for eventual Option B migration
+1. Implement `Bit.Vector.Protocol` in `swift-bit-vector-primitives`
+2. Conform all 5 variants
+3. Update buffer-primitives consume files to use `popFirst()`
+4. File Swift compiler bug for subscript get/set in ~Copyable protocol extensions
+5. Remove subscript requirement when compiler bug is fixed (make it a default)
 
 ## References
 
+- `swift-bit-vector-primitives/Experiments/bit-vector-protocol/` — feasibility experiment (CONFIRMED)
 - `swift-buffer-primitives/Sources/Buffer Slab Primitives/Buffer.Slab+Consume.swift` — trigger for this research
 - `swift-bit-vector-primitives/Sources/Bit Vector Primitives/Bit.Vector+pop.swift` — existing `pop.first()` on base Vector
 - `swift-buffer-primitives/Research/buffer-variant-parity-analysis.md` — prior art on API parity analysis

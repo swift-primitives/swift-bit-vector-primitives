@@ -108,16 +108,6 @@ extension Bit.Vector.Inline {
     @inlinable
     public var isFull: Bool { _count >= Self._capacity }
 
-    /// The number of bits set to true.
-    @inlinable
-    public var popcount: Bit.Index.Count {
-        var total: UInt = 0
-        for i in 0..<wordCount {
-            total += UInt(_storage[i].nonzeroBitCount)
-        }
-        return Bit.Index.Count(Cardinal(total))
-    }
-
     /// The first bit value, or `nil` if empty.
     @inlinable
     public var first: Bool? {

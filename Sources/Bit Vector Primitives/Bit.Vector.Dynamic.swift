@@ -111,16 +111,6 @@ extension Bit.Vector.Dynamic {
     @inlinable
     public var isEmpty: Bool { _count == .zero }
 
-    /// The number of bits set to true.
-    @inlinable
-    public var popcount: Bit.Index.Count {
-        var total: UInt = 0
-        for word in _storage {
-            total += UInt(word.nonzeroBitCount)
-        }
-        return Bit.Index.Count(Cardinal(total))
-    }
-
     /// The first bit value, or `nil` if empty.
     @inlinable
     public var first: Bool? {

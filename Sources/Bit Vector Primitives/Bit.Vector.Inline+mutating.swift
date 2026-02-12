@@ -44,14 +44,6 @@ extension Bit.Vector.Inline {
         _storage[loc.word] ^= loc.mask
     }
 
-    /// Clears all bits to false.
-    @inlinable
-    public mutating func clearAll() {
-        for i in 0..<wordCount {
-            _storage[i] = 0
-        }
-    }
-
     /// Sets all bits (up to count) to true.
     @inlinable
     public mutating func setAll() {
