@@ -19,7 +19,7 @@ extension Bit.Vector.Ones.Bounded {
     ///
     /// - Complexity: O(popcount) total across all `next()` calls.
     @safe
-    public struct Iterator: IteratorProtocol {
+    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
         let _storage: ContiguousArray<UInt>
 

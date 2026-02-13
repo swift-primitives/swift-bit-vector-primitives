@@ -20,7 +20,7 @@ extension Bit.Vector.Ones.View {
     ///
     /// - Complexity: O(popcount) total across all `next()` calls.
     @safe
-    public struct Iterator: IteratorProtocol {
+    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
         let _words: UnsafeMutablePointer<UInt>
 

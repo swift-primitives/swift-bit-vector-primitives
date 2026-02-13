@@ -15,7 +15,7 @@ extension Bit.Vector.Ones.Static {
     /// Same Wegner/Kernighan algorithm as `Ones.View.Iterator` but reads from
     /// a copied `InlineArray` instead of a pointer.
     @safe
-    public struct Iterator: IteratorProtocol {
+    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
         let _storage: InlineArray<wordCount, UInt>
 

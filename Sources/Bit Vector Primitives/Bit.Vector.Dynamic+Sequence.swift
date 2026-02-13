@@ -13,7 +13,7 @@
 
 extension Bit.Vector.Dynamic: Swift.Sequence {
     /// An iterator over all bits in the vector.
-    public struct Iterator: IteratorProtocol, Sendable {
+    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol, Sendable {
         @usableFromInline
         let storage: ContiguousArray<UInt>
 

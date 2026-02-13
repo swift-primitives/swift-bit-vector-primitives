@@ -15,7 +15,7 @@ extension Bit.Vector.Zeros.Static {
     /// Same complement + Wegner/Kernighan algorithm as `Zeros.View.Iterator`
     /// but reads from a copied `InlineArray` instead of a pointer.
     @safe
-    public struct Iterator: IteratorProtocol {
+    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
         let _storage: InlineArray<wordCount, UInt>
 

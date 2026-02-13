@@ -20,7 +20,7 @@ extension Bit.Vector.Zeros.View {
     ///
     /// - Complexity: O(zero-count) total across all `next()` calls.
     @safe
-    public struct Iterator: IteratorProtocol {
+    public struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
         let _words: UnsafeMutablePointer<UInt>
 
