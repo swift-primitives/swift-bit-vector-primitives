@@ -44,25 +44,4 @@ extension Bit.Vector.Dynamic {
         _storage[loc.word] ^= loc.mask
     }
 
-    /// Clears all bits to false.
-    @inlinable
-    public mutating func clearAll() {
-        for i in 0..<_storage.count {
-            _storage[i] = 0
-        }
-    }
-
-    /// Sets all bits to true.
-    @inlinable
-    public mutating func setAll() {
-        for i in 0..<_storage.count {
-            _storage[i] = ~0
-        }
-        let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
-        if pack.bits.unused > .zero && !_storage.isEmpty {
-            let lastWord = _storage.count - 1
-            let mask: UInt = ~0 >> pack.bits.unused
-            _storage[lastWord] = mask
-        }
-    }
 }

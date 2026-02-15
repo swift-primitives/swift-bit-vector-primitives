@@ -63,25 +63,29 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
 
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
     /// Clears all bits to false.
+    ///
+    /// Core logic as static method per [IMPL-023]. Instance method and
+    /// `Property.View` `.clear.all()` both delegate here.
     @inlinable
-    public mutating func clearAll() {
-        for i in 0..<wordCount {
-            setWord(at: i, to: 0)
+    public static func clearAll(_ vector: inout Self) {
+        for i in 0..<vector.wordCount {
+            vector.setWord(at: i, to: 0)
         }
     }
 
     /// Sets all bits to true (up to capacity).
     ///
-    /// Masks the last word to avoid setting bits beyond `bitCapacity`.
+    /// Core logic as static method per [IMPL-023]. Property.View
+    /// `.set.all()` delegates here.
     @inlinable
-    public mutating func setAll() {
-        let pack = Bit.Pack<UInt>(count: bitCapacity, bitsPerWord: .bitsPerWord)
-        let wc = wordCount
+    public static func setAll(_ vector: inout Self) {
+        let pack = Bit.Pack<UInt>(count: vector.bitCapacity, bitsPerWord: .bitsPerWord)
+        let wc = vector.wordCount
         for i in 0..<wc {
-            setWord(at: i, to: ~0)
+            vector.setWord(at: i, to: ~0)
         }
         if pack.bits.unused > .zero && wc > 0 {
-            setWord(at: wc - 1, to: ~0 >> pack.bits.unused)
+            vector.setWord(at: wc - 1, to: ~0 >> pack.bits.unused)
         }
     }
 }
@@ -170,15 +174,15 @@ extension Property.View where Tag == Bit.Vector.Pop, Base: Bit.Vector.`Protocol`
 extension Property.View where Tag == Bit.Vector.Set, Base: Bit.Vector.`Protocol` & ~Copyable {
     /// Sets all bits to true.
     @inlinable
-    public func all() {
-        unsafe base.pointee.setAll()
+    public mutating func all() {
+        unsafe Base.setAll(&base.pointee)
     }
 }
 
 extension Property.View where Tag == Bit.Vector.Clear, Base: Bit.Vector.`Protocol` & ~Copyable {
     /// Clears all bits to false.
     @inlinable
-    public func all() {
-        unsafe base.pointee.clearAll()
+    public mutating func all() {
+        unsafe Base.clearAll(&base.pointee)
     }
 }

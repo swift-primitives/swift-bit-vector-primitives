@@ -9,7 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Sequence_Primitives_Core
+public import Sequence_Primitives_Core
 
 // MARK: - Sequence.Protocol
 
@@ -29,4 +29,23 @@ extension Bit.Vector.Ones.View: Swift.Sequence {
     /// `Sequence.Protocol where Self: Copyable` and `Swift.Sequence`.
     @inlinable
     public var underestimatedCount: Int { 0 }
+
+    /// Forces closure inlining during mandatory SIL passes by shadowing
+    /// `Swift.Sequence.forEach` with `@inline(__always)`.
+    ///
+    /// Without this, `Swift.Sequence.forEach` (which is `@inlinable` but not
+    /// `@inline(__always)`) leaves closures as separate `partial_apply` SIL
+    /// entities. In class deinits with `~Copyable` generic parameters, the
+    /// `partial_apply` captures `self` with `ForwardingConsume` semantics,
+    /// and CopyPropagation cannot track the lifetime — causing a crash.
+    // WORKAROUND: @inline(__always) forEach — CopyPropagation crash (Swift 6.2.3)
+    // WHEN TO REMOVE: When swiftlang/swift CopyPropagation ~Copyable deinit bug is fixed
+    @inline(__always)
+    @inlinable
+    public func forEach(_ body: (Bit.Index) -> Void) {
+        var iterator = makeIterator()
+        while let element = iterator.next() {
+            body(element)
+        }
+    }
 }
