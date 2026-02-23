@@ -11,18 +11,16 @@
 
 import Property_Primitives
 
-extension Property.View where Tag == Bit.Vector.Clear {
-    /// Clears all bits in the given range to false.
+extension Property.View where Tag == Bit.Vector.Set, Base: Bit.Vector.`Protocol` & ~Copyable {
+    /// Sets all bits in the given range to true.
     ///
     /// Uses word-level operations for O(wordCount) performance regardless
     /// of range size. An empty range is a no-op.
     ///
-    /// - Parameter range: The half-open range of bit indices to clear.
+    /// - Parameter range: The half-open range of bit indices to set.
     /// - Complexity: O(wordCount) — constant for fixed-size vectors.
     @inlinable
-    public func range<let wordCount: Int>(
-        _ range: Swift.Range<Bit.Index>
-    ) where Base == Bit.Vector.Static<wordCount> {
+    public func range(_ range: Swift.Range<Bit.Index>) {
         guard range.upperBound > range.lowerBound else { return }
 
         let startLoc = Bit.Pack<UInt>.Location(index: range.lowerBound, bitsPerWord: .bitsPerWord)
@@ -30,21 +28,27 @@ extension Property.View where Tag == Bit.Vector.Clear {
         let startBit = startLoc.bit.magnitude
         let endBit = endLoc.bit.magnitude
 
+        let startWord = Int(bitPattern: startLoc.word)
+        let endWord = Int(bitPattern: endLoc.word)
+
         let lowMask: UInt = ~0 << startBit
         let maxBitIndex = try! Bit.Pack<UInt>.bitWidth.subtract.exact(.one)
         let highShift = try! maxBitIndex.subtract.exact(endBit)
         let highMask: UInt = ~0 >> highShift
 
-        if startLoc.word == endLoc.word {
-            unsafe base.pointee._storage[startLoc.word] &= ~(lowMask & highMask)
+        if startWord == endWord {
+            let current = unsafe base.pointee.word(at: startWord)
+            unsafe base.pointee.setWord(at: startWord, to: current | (lowMask & highMask))
         } else {
-            unsafe base.pointee._storage[startLoc.word] &= ~lowMask
-            var w = startLoc.word + Index<UInt>.Count.one
-            while w < endLoc.word {
-                unsafe base.pointee._storage[w] = 0
-                w = w + Index<UInt>.Count.one
+            let startCurrent = unsafe base.pointee.word(at: startWord)
+            unsafe base.pointee.setWord(at: startWord, to: startCurrent | lowMask)
+            var w = startWord + 1
+            while w < endWord {
+                unsafe base.pointee.setWord(at: w, to: ~0)
+                w += 1
             }
-            unsafe base.pointee._storage[endLoc.word] &= ~highMask
+            let endCurrent = unsafe base.pointee.word(at: endWord)
+            unsafe base.pointee.setWord(at: endWord, to: endCurrent | highMask)
         }
     }
 }

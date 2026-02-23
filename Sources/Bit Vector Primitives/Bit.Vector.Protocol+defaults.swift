@@ -121,6 +121,14 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
     }
 }
 
+// MARK: - Any
+
+extension Bit.Vector.`Protocol` where Self: ~Copyable {
+    /// Whether any bit is true.
+    @inlinable
+    public var any: Bool { !allFalse }
+}
+
 // MARK: - Property.View Accessors
 
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
