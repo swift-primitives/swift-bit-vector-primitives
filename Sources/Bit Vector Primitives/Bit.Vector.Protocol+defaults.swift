@@ -106,13 +106,12 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
         for i in 0..<wordCount {
             let w = word(at: i)
             if w != 0 {
-                let bitPosition = w.trailingZeroBitCount
-                // Wegner/Kernighan: clear lowest set bit
+                let location = Bit.Pack<UInt>.Location(
+                    word: .init(Ordinal(UInt(i))),
+                    bit: .init(Affine.Discrete.Vector(w.trailingZeroBitCount))
+                )
                 setWord(at: i, to: w & (w &- 1))
-                // Compute global bit index via typed arithmetic
-                let wordAsCount = Index_Primitives.Index<UInt>.Count(Cardinal(UInt(i)))
-                let baseBitCount = wordAsCount * .bitsPerWord
-                let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+                let globalIndex = location.index(bitsPerWord: .bitsPerWord)
                 guard globalIndex < bitCapacity else { return nil }
                 return globalIndex
             }
@@ -194,3 +193,4 @@ extension Property.View where Tag == Bit.Vector.Clear, Base: Bit.Vector.`Protoco
         unsafe Base.clearAll(&base.pointee)
     }
 }
+

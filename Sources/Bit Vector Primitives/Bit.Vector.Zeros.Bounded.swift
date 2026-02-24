@@ -35,6 +35,33 @@ extension Bit.Vector.Zeros {
     }
 }
 
+// MARK: - Word-Level Search
+
+extension Bit.Vector.Zeros.Bounded {
+    /// The first clear bit position below `max`, or `nil` if none.
+    ///
+    /// Word-level scanning: inverts each word and uses
+    /// `trailingZeroBitCount` to find the lowest zero. O(words).
+    ///
+    /// - Parameter max: Upper bound (exclusive) on the bit position.
+    @inlinable
+    public func first(max: Bit.Index.Count) -> Bit.Index? {
+        for i in 0..<_storage.count {
+            let inverted = ~_storage[i]
+            if inverted != 0 {
+                let location = Bit.Pack<UInt>.Location(
+                    word: .init(Ordinal(UInt(i))),
+                    bit: .init(Affine.Discrete.Vector(inverted.trailingZeroBitCount))
+                )
+                let globalIndex = location.index(bitsPerWord: .bitsPerWord)
+                guard globalIndex < max else { return nil }
+                return globalIndex
+            }
+        }
+        return nil
+    }
+}
+
 // MARK: - Sequence.Protocol
 
 extension Bit.Vector.Zeros.Bounded: Sequence.`Protocol` {
