@@ -11,100 +11,91 @@
 
 import Affine_Primitives
 
-// MARK: - Bit.Vector.Bounded
+// MARK: - Bit.Vector.Inline
 
 extension Bit.Vector {
-    /// Fixed-capacity packed bit array.
+    /// Zero-allocation packed bit array with compile-time capacity.
     ///
-    /// `Bit.Vector.Bounded` stores bits packed into `UInt` words with a fixed
-    /// maximum capacity. Append operations throw on overflow.
+    /// `Bit.Vector.Inline` stores bits in inline storage using `InlineArray`,
+    /// avoiding heap allocation entirely. The capacity is specified as a compile-time
+    /// constant representing the number of `UInt` words.
+    ///
+    /// Unlike `Bit.Vector.Static<N>` (which always uses full capacity as a pure bitmap),
+    /// `Inline<N>` has variable count with bounded capacity — it's a container.
     ///
     /// ```swift
-    /// var bits = Bit.Vector.Bounded(capacity: Bit.Index.Count(100))
+    /// // 2 words = 128 bits on 64-bit systems
+    /// var bits = Bit.Vector.Inline<2>()
     /// try bits.append(true)
-    /// try bits.set(Bit.Index(50))
-    /// bits[Bit.Index(50)]  // true
+    /// try bits.append(false)
+    /// bits[Bit.Index(0)]  // true
     /// ```
-    public struct Bounded: Sendable {
-        @usableFromInline
-        let _capacity: Bit.Index.Count
-
-        @usableFromInline
-        var _storage: ContiguousArray<UInt>
-
-        @usableFromInline
-        var _count: Bit.Index.Count
-
-        /// Creates an empty bounded bit vector with the specified capacity.
+    public struct Inline<let wordCount: Int>: Sendable {
+        /// The maximum number of bits that can be stored.
         @inlinable
-        public init(capacity: Bit.Index.Count) {
-            let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
-            self._capacity = capacity
-            self._storage = ContiguousArray(repeating: 0, count: pack.words.count)
+        public static var _capacity: Bit.Index.Count {
+            Bit.Index.Count(Cardinal(UInt(wordCount * UInt.bitWidth)))
+        }
+
+        @usableFromInline
+        package var _storage: InlineArray<wordCount, UInt>
+
+        @usableFromInline
+        package var _count: Bit.Index.Count
+
+        /// Creates an empty inline bit vector.
+        @inlinable
+        public init() {
+            self._storage = InlineArray(repeating: 0)
             self._count = .zero
         }
 
-        /// Creates a bounded bit vector with an initial count.
+        /// Creates an inline bit vector with an initial count.
         ///
         /// - Throws: `Error.overflow` if count exceeds capacity.
         @inlinable
-        public init(capacity: Bit.Index.Count, count: Bit.Index.Count) throws(Error) {
-            guard count <= capacity else {
+        public init(count: Bit.Index.Count) throws(Error) {
+            guard count <= Self._capacity else {
                 throw .overflow
             }
-            let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
-            self._capacity = capacity
-            self._storage = ContiguousArray(repeating: 0, count: pack.words.count)
+            self._storage = InlineArray(repeating: 0)
             self._count = count
         }
 
-        /// Creates a bounded bit vector from a sequence.
-        ///
-        /// - Throws: `Error.overflow` if the sequence exceeds capacity.
-        @inlinable
-        public init<S: Swift.Sequence>(capacity: Bit.Index.Count, _ elements: S) throws(Error) where S.Element == Bool {
-            self.init(capacity: capacity)
-            for element in elements {
-                try append(element)
-            }
-        }
-
-        /// Creates a bounded bit vector with a repeated value.
+        /// Creates an inline bit vector with a repeated value.
         ///
         /// - Throws: `Error.overflow` if count exceeds capacity.
         @inlinable
-        public init(capacity: Bit.Index.Count, repeating value: Bool, count: Bit.Index.Count) throws(Error) {
-            guard count <= capacity else {
+        public init(repeating value: Bool, count: Bit.Index.Count) throws(Error) {
+            guard count <= Self._capacity else {
                 throw .overflow
             }
-            let pack = Bit.Pack<UInt>(count: capacity, bitsPerWord: .bitsPerWord)
-            self._capacity = capacity
-            self._storage = ContiguousArray(repeating: value ? ~0 : 0, count: pack.words.count)
+            self._storage = InlineArray(repeating: value ? ~0 : 0)
             self._count = count
 
             if value && count > .zero {
-                let countPack = Bit.Pack<UInt>(count: count, bitsPerWord: .bitsPerWord)
-                if countPack.bits.unused > .zero {
-                    let lastWord = try! countPack.words.count.map(Ordinal.init).predecessor.exact()
-                    let mask: UInt = ~0 >> countPack.bits.unused
-                    _storage[lastWord] = mask
+                let pack = Bit.Pack<UInt>(count: count, bitsPerWord: .bitsPerWord)
+                if pack.bits.unused > .zero {
+                    let lastWordIndex = try! pack.words.count.map(Ordinal.init).predecessor.exact()
+                    let mask: UInt = ~0 >> pack.bits.unused
+                    _storage[lastWordIndex] = mask
                 }
                 // Clear words beyond count
-                let countWords = Int(bitPattern: countPack.words.count)
-                for i in countWords..<_storage.count {
+                let countWords = Int(bitPattern: pack.words.count)
+                for i in countWords..<wordCount {
                     _storage[i] = 0
                 }
             }
         }
 
         /// Errors that can occur during operations.
-        public typealias Error = __BitVectorBoundedError
+        public typealias Error = __BitVectorInlineError
     }
 }
 
 // MARK: - Properties
 
-extension Bit.Vector.Bounded {
+extension Bit.Vector.Inline {
     /// The number of bits.
     @inlinable
     public var count: Bit.Index.Count { _count }
@@ -115,7 +106,7 @@ extension Bit.Vector.Bounded {
 
     /// Whether the vector is at full capacity.
     @inlinable
-    public var isFull: Bool { _count >= _capacity }
+    public var isFull: Bool { _count >= Self._capacity }
 
     /// The first bit value, or `nil` if empty.
     @inlinable
@@ -136,7 +127,7 @@ extension Bit.Vector.Bounded {
 
 // MARK: - Subscript Access
 
-extension Bit.Vector.Bounded {
+extension Bit.Vector.Inline {
     /// Gets or sets the bit at the given index.
     @inlinable
     public subscript(index: Bit.Index) -> Bool {
