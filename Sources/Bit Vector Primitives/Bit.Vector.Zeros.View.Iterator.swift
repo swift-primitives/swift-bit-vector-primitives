@@ -36,12 +36,16 @@ extension Bit.Vector.Zeros.View {
         @usableFromInline
         var _currentWord: UInt
 
+        @usableFromInline
+        var _buffer: InlineArray<1, Bit.Index>
+
         @inlinable
         package init(view: Bit.Vector.Zeros.View) {
             unsafe self._words = view._words
             self._wordCount = view._wordCount
             self._capacity = view._capacity
             self._wordIndex = .zero
+            self._buffer = InlineArray(repeating: .zero)
             if view._wordCount > .zero {
                 unsafe self._currentWord = ~view._words[.zero]
             } else {
@@ -70,6 +74,39 @@ extension Bit.Vector.Zeros.View {
 
             guard globalIndex < _capacity else { return nil }
             return globalIndex
+        }
+
+        @_lifetime(&self)
+        @inlinable
+        public mutating func nextSpan(maximumCount: Cardinal) -> Swift.Span<Bit.Index> {
+            guard maximumCount > .zero else {
+                return _buffer.span.extracting(first: 0)
+            }
+
+            // Advance to next word with clear bits
+            while _currentWord == 0 {
+                let next = _wordIndex.successor.saturating()
+                guard next < _wordCount else {
+                    return _buffer.span.extracting(first: 0)
+                }
+                _wordIndex = next
+                unsafe _currentWord = ~_words[_wordIndex]
+            }
+
+            // Wegner/Kernighan: extract lowest set bit of complemented word
+            let bitPosition = _currentWord.trailingZeroBitCount
+            _currentWord &= _currentWord &- 1
+
+            // Compute global bit index via pack location
+            let wordAsCount = Index_Primitives.Index<UInt>.Count(_wordIndex)
+            let baseBitCount = wordAsCount * .bitsPerWord
+            let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+
+            guard globalIndex < _capacity else {
+                return _buffer.span.extracting(first: 0)
+            }
+            _buffer[0] = globalIndex
+            return _buffer.span
         }
     }
 }

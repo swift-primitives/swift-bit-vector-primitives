@@ -25,10 +25,14 @@ extension Bit.Vector.Ones.Static {
         @usableFromInline
         var _currentWord: UInt
 
+        @usableFromInline
+        var _buffer: InlineArray<1, Bit.Index>
+
         @inlinable
         package init(storage: InlineArray<wordCount, UInt>) {
             self._storage = storage
             self._wordIndex = 0
+            self._buffer = InlineArray(repeating: .zero)
             if wordCount > 0 {
                 self._currentWord = storage[0]
             } else {
@@ -52,6 +56,32 @@ extension Bit.Vector.Ones.Static {
             let wordCount = Index_Primitives.Index<UInt>.Count(Cardinal(UInt(_wordIndex)))
             let baseBitCount = wordCount * .bitsPerWord
             return baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+        }
+
+        @_lifetime(&self)
+        @inlinable
+        public mutating func nextSpan(maximumCount: Cardinal) -> Swift.Span<Bit.Index> {
+            guard maximumCount > .zero else {
+                return _buffer.span.extracting(first: 0)
+            }
+
+            // Advance to next word with set bits
+            while _currentWord == 0 {
+                _wordIndex += 1
+                guard _wordIndex < wordCount else {
+                    return _buffer.span.extracting(first: 0)
+                }
+                _currentWord = _storage[_wordIndex]
+            }
+
+            // Wegner/Kernighan: extract lowest set bit
+            let bitPosition = _currentWord.trailingZeroBitCount
+            _currentWord &= _currentWord &- 1
+
+            let wordCount = Index_Primitives.Index<UInt>.Count(Cardinal(UInt(_wordIndex)))
+            let baseBitCount = wordCount * .bitsPerWord
+            _buffer[0] = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+            return _buffer.span
         }
     }
 }

@@ -24,10 +24,14 @@ extension Bit.Vector.Bounded: Swift.Sequence {
         var index: Int
 
         @usableFromInline
+        var _buffer: InlineArray<1, Bool>
+
+        @usableFromInline
         init(storage: ContiguousArray<UInt>, count: Int) {
             self.storage = storage
             self.count = count
             self.index = 0
+            self._buffer = InlineArray(repeating: false)
         }
 
         @inlinable
@@ -38,6 +42,20 @@ extension Bit.Vector.Bounded: Swift.Sequence {
             let mask: UInt = 1 << bitIndex
             defer { index += 1 }
             return (storage[wordIndex] & mask) != 0
+        }
+
+        @_lifetime(&self)
+        @inlinable
+        public mutating func nextSpan(maximumCount: Cardinal) -> Swift.Span<Bool> {
+            guard maximumCount > .zero, index < count else {
+                return _buffer.span.extracting(first: 0)
+            }
+            let wordIndex = index / UInt.bitWidth
+            let bitIndex = index % UInt.bitWidth
+            let mask: UInt = 1 << bitIndex
+            _buffer[0] = (storage[wordIndex] & mask) != 0
+            index += 1
+            return _buffer.span
         }
     }
 
