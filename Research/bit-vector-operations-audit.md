@@ -165,7 +165,7 @@ Heap-allocated with `ContiguousArray<UInt>`. Has count tracking, throws on overf
 |-----------|-----------|------------|
 | `init(capacity:)` | `public init(capacity: Bit.Index.Count)` | O(n/w) |
 | `init(capacity:count:)` | `public init(capacity: Bit.Index.Count, count: Bit.Index.Count) throws(Error)` | O(n/w) |
-| `init(capacity:_:)` | `public init<S: Sequence>(capacity: Bit.Index.Count, _ elements: S) throws(Error) where S.Element == Bool` | O(n) |
+| `init(capacity:_:)` | `public init<S: Swift.Sequence>(capacity: Bit.Index.Count, _ elements: S) throws(Error) where S.Element == Bool` | O(n) |
 | `init(capacity:repeating:count:)` | `public init(capacity: Bit.Index.Count, repeating value: Bool, count: Bit.Index.Count) throws(Error)` | O(n/w) |
 | `count` | `public var count: Bit.Index.Count` | O(1) |
 | `isEmpty` | `public var isEmpty: Bool` (count-based) | O(1) |
@@ -302,8 +302,8 @@ Heap-allocated with `ContiguousArray<UInt>`. Growable. Append never throws.
 | `init(count:)` | `public init(count: Bit.Index.Count)` | O(n/w) |
 | `init(repeating:count:)` | `public init(repeating value: Bool, count: Bit.Index.Count)` | O(n/w) |
 | `init(repeating:count:)` | `public init(repeating bit: Bit, count: Bit.Index.Count)` | O(n/w) |
-| `init(_:)` | `public init<S: Sequence>(_ elements: S) where S.Element == Bool` | O(n) |
-| `init(_:)` | `public init<S: Sequence>(_ elements: S) where S.Element == Bit` | O(n) |
+| `init(_:)` | `public init<S: Swift.Sequence>(_ elements: S) where S.Element == Bool` | O(n) |
+| `init(_:)` | `public init<S: Swift.Sequence>(_ elements: S) where S.Element == Bit` | O(n) |
 | `count` | `public var count: Bit.Index.Count` | O(1) |
 | `isEmpty` | `public var isEmpty: Bool` (count-based) | O(1) |
 | `first` | `public var first: Bool?` | O(1) |
