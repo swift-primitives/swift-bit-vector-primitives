@@ -38,8 +38,6 @@ extension Bit.Vector.Ones.View: Swift.Sequence {
     /// entities. In class deinits with `~Copyable` generic parameters, the
     /// `partial_apply` captures `self` with `ForwardingConsume` semantics,
     /// and CopyPropagation cannot track the lifetime — causing a crash.
-    // WORKAROUND: @inline(__always) forEach — CopyPropagation crash (Swift 6.2.3)
-    // WHEN TO REMOVE: When swiftlang/swift CopyPropagation ~Copyable deinit bug is fixed
     @inline(__always)
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
