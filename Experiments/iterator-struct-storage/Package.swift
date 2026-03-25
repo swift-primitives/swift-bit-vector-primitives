@@ -20,7 +20,6 @@ let package = Package(
                 .enableUpcomingFeature("MemberImportsByDefault"),
                 .enableExperimentalFeature("Lifetimes"),
                 .enableExperimentalFeature("SuppressedAssociatedTypes"),
-                .enableExperimentalFeature("SuppressedAssociatedTypesWithDefaults"),
             ]
         )
     ],

@@ -31,14 +31,14 @@ extension Bit.Vector.Ones.View: Swift.Sequence {
     public var underestimatedCount: Int { 0 }
 
     /// Forces closure inlining during mandatory SIL passes by shadowing
-    /// `Swift.Sequence.forEach` with `@inline(__always)`.
+    /// `Swift.Sequence.forEach` with `@inline(always)`.
     ///
     /// Without this, `Swift.Sequence.forEach` (which is `@inlinable` but not
-    /// `@inline(__always)`) leaves closures as separate `partial_apply` SIL
+    /// `@inline(always)`) leaves closures as separate `partial_apply` SIL
     /// entities. In class deinits with `~Copyable` generic parameters, the
     /// `partial_apply` captures `self` with `ForwardingConsume` semantics,
     /// and CopyPropagation cannot track the lifetime — causing a crash.
-    @inline(__always)
+    @inline(always)
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
         var iterator = makeIterator()
