@@ -18,6 +18,10 @@ extension Bit.Vector.Zeros {
     /// without requiring exclusive access. This enables `zeros.forEach` to work
     /// from non-mutating contexts (including `deinit`).
     @safe
+    // WHY: Category D — structural Sendable workaround (SP-5).
+    // WHY: Raw-pointer view. UnsafeMutablePointer blocks structural inference.
+    // WHEN TO REMOVE: When compiler gains structural Sendable through raw pointers.
+    // TRACKING: unsafe-audit-findings.md Category D SP-5.
     public struct View: Copyable, @unchecked Sendable {
         @usableFromInline
         let _words: UnsafeMutablePointer<UInt>

@@ -143,4 +143,9 @@ extension Bit.Vector {
 
 // MARK: - Sendable
 
+// WHY: Category D — structural Sendable workaround (SP-5).
+// WHY: Raw-pointer-backed Copyable type. UnsafeMutablePointer blocks structural
+// WHY: Sendable inference. The type itself does not own the allocation.
+// WHEN TO REMOVE: When compiler gains structural Sendable through raw pointers.
+// TRACKING: unsafe-audit-findings.md Category D SP-5.
 extension Bit.Vector: @unchecked Sendable {}
