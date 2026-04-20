@@ -21,16 +21,16 @@ enum BitVectorInlineTests {
 // MARK: - Unit Tests
 
 extension BitVectorInlineTests.Unit {
-    @Test("Create empty")
-    func createEmpty() {
+    @Test
+    func `Create empty`() {
         let bits = Bit.Vector.Inline<2>()
         #expect(bits.isEmpty)
         #expect(bits.count == 0)
         #expect(!bits.isFull)
     }
 
-    @Test("Append and subscript")
-    func appendAndSubscript() throws {
+    @Test
+    func `Append and subscript`() throws {
         var bits = Bit.Vector.Inline<1>()
 
         try bits.append(true)
@@ -43,8 +43,8 @@ extension BitVectorInlineTests.Unit {
         #expect(bits.count == 3)
     }
 
-    @Test("Overflow throws")
-    func overflowThrows() throws {
+    @Test
+    func `Overflow throws`() throws {
         var bits = Bit.Vector.Inline<1>()
         for _ in 0..<64 {
             try bits.append(true)
@@ -56,8 +56,8 @@ extension BitVectorInlineTests.Unit {
         }
     }
 
-    @Test("popLast")
-    func popLast() throws {
+    @Test
+    func `popLast`() throws {
         var bits = Bit.Vector.Inline<1>()
         try bits.append(true)
         try bits.append(false)
@@ -73,8 +73,8 @@ extension BitVectorInlineTests.Unit {
         #expect(bits.popLast() == nil)
     }
 
-    @Test("set and clear")
-    func setAndClear() throws {
+    @Test
+    func `set and clear`() throws {
         var bits = try Bit.Vector.Inline<1>(count: 10)
 
         try bits.set(5)
@@ -84,8 +84,8 @@ extension BitVectorInlineTests.Unit {
         #expect(bits[5] == false)
     }
 
-    @Test("toggle")
-    func toggle() throws {
+    @Test
+    func `toggle`() throws {
         var bits = try Bit.Vector.Inline<1>(count: 10)
 
         try bits.toggle(3)
@@ -95,8 +95,8 @@ extension BitVectorInlineTests.Unit {
         #expect(bits[3] == false)
     }
 
-    @Test("statistic.true and statistic.false")
-    func statistics() throws {
+    @Test
+    func `statistic.true and statistic.false`() throws {
         var bits = try Bit.Vector.Inline<1>(count: 5)
         try bits.set(0)
         try bits.set(2)
@@ -106,8 +106,8 @@ extension BitVectorInlineTests.Unit {
         #expect(bits.statistic.false == 2)
     }
 
-    @Test("capacity.maximum and capacity.remaining")
-    func capacity() throws {
+    @Test
+    func `capacity.maximum and capacity.remaining`() throws {
         var bits = Bit.Vector.Inline<2>()
         try bits.append(true)
         try bits.append(false)
@@ -116,8 +116,8 @@ extension BitVectorInlineTests.Unit {
         #expect(bits.capacity.remaining == 126)
     }
 
-    @Test("Iteration")
-    func iteration() throws {
+    @Test
+    func `Iteration`() throws {
         var bits = Bit.Vector.Inline<1>()
         try bits.append(true)
         try bits.append(false)
@@ -131,8 +131,8 @@ extension BitVectorInlineTests.Unit {
         #expect(values == [true, false, true])
     }
 
-    @Test("Equality")
-    func equality() throws {
+    @Test
+    func `Equality`() throws {
         var a = Bit.Vector.Inline<1>()
         var b = Bit.Vector.Inline<1>()
 
@@ -148,8 +148,8 @@ extension BitVectorInlineTests.Unit {
         #expect(a != b)
     }
 
-    @Test("Description")
-    func description() throws {
+    @Test
+    func `Description`() throws {
         var bits = Bit.Vector.Inline<1>()
         try bits.append(true)
         try bits.append(false)
@@ -159,22 +159,22 @@ extension BitVectorInlineTests.Unit {
         #expect(desc.contains("10"))
     }
 
-    @Test("Init with count")
-    func initWithCount() throws {
+    @Test
+    func `Init with count`() throws {
         let bits = try Bit.Vector.Inline<2>(count: 100)
         #expect(bits.count == 100)
         #expect(bits.popcount == 0)
     }
 
-    @Test("Init repeating true")
-    func initRepeatingTrue() throws {
+    @Test
+    func `Init repeating true`() throws {
         let bits = try Bit.Vector.Inline<1>(repeating: true, count: 10)
         #expect(bits.count == 10)
         #expect(bits.popcount == 10)
     }
 
-    @Test("Init repeating false")
-    func initRepeatingFalse() throws {
+    @Test
+    func `Init repeating false`() throws {
         let bits = try Bit.Vector.Inline<1>(repeating: false, count: 10)
         #expect(bits.count == 10)
         #expect(bits.popcount == 0)
@@ -184,8 +184,8 @@ extension BitVectorInlineTests.Unit {
 // MARK: - Edge Cases
 
 extension BitVectorInlineTests.EdgeCase {
-    @Test("Word boundary")
-    func wordBoundary() throws {
+    @Test
+    func `Word boundary`() throws {
         var bits = try Bit.Vector.Inline<2>(count: 100)
 
         bits[63] = true
@@ -197,8 +197,8 @@ extension BitVectorInlineTests.EdgeCase {
         #expect(bits[65] == false)
     }
 
-    @Test("Bounds error")
-    func boundsError() throws {
+    @Test
+    func `Bounds error`() throws {
         var bits = try Bit.Vector.Inline<1>(count: 5)
 
         #expect(throws: __BitVectorInlineError.self) {
@@ -206,8 +206,8 @@ extension BitVectorInlineTests.EdgeCase {
         }
     }
 
-    @Test("Conversion to Dynamic")
-    func conversionToDynamic() throws {
+    @Test
+    func `Conversion to Dynamic`() throws {
         var inline = Bit.Vector.Inline<1>()
         try inline.append(true)
         try inline.append(false)

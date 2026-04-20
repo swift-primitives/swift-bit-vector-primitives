@@ -21,16 +21,16 @@ enum BitVectorBoundedTests {
 // MARK: - Unit Tests
 
 extension BitVectorBoundedTests.Unit {
-    @Test("Create empty with capacity")
-    func createEmpty() throws {
+    @Test
+    func `Create empty with capacity`() throws {
         let bits = try Bit.Vector.Bounded(capacity: 100)
         #expect(bits.isEmpty)
         #expect(bits.count == 0)
         #expect(!bits.isFull)
     }
 
-    @Test("Append and subscript")
-    func appendAndSubscript() throws {
+    @Test
+    func `Append and subscript`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 64)
 
         try bits.append(true)
@@ -43,8 +43,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(bits.count == 3)
     }
 
-    @Test("Overflow throws")
-    func overflowThrows() throws {
+    @Test
+    func `Overflow throws`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 2)
         try bits.append(true)
         try bits.append(false)
@@ -54,8 +54,8 @@ extension BitVectorBoundedTests.Unit {
         }
     }
 
-    @Test("popLast")
-    func popLast() throws {
+    @Test
+    func `popLast`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 64)
         try bits.append(true)
         try bits.append(false)
@@ -71,8 +71,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(bits.popLast() == nil)
     }
 
-    @Test("set and clear")
-    func setAndClear() throws {
+    @Test
+    func `set and clear`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 20, repeating: false, count: 10)
 
         try bits.set(5)
@@ -82,8 +82,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(bits[5] == false)
     }
 
-    @Test("toggle")
-    func toggle() throws {
+    @Test
+    func `toggle`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 20, repeating: false, count: 10)
 
         try bits.toggle(3)
@@ -93,8 +93,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(bits[3] == false)
     }
 
-    @Test("statistic.true and statistic.false")
-    func statistics() throws {
+    @Test
+    func `statistic.true and statistic.false`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 64, repeating: false, count: 5)
         try bits.set(0)
         try bits.set(2)
@@ -104,8 +104,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(bits.statistic.false == 2)
     }
 
-    @Test("capacity.maximum and capacity.remaining")
-    func capacity() throws {
+    @Test
+    func `capacity.maximum and capacity.remaining`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 128)
         try bits.append(true)
         try bits.append(false)
@@ -114,8 +114,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(bits.capacity.remaining == 126)
     }
 
-    @Test("Iteration")
-    func iteration() throws {
+    @Test
+    func `Iteration`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 64)
         try bits.append(true)
         try bits.append(false)
@@ -129,8 +129,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(values == [true, false, true])
     }
 
-    @Test("Equality")
-    func equality() throws {
+    @Test
+    func `Equality`() throws {
         var a = try Bit.Vector.Bounded(capacity: 64)
         var b = try Bit.Vector.Bounded(capacity: 64)
 
@@ -146,8 +146,8 @@ extension BitVectorBoundedTests.Unit {
         #expect(a != b)
     }
 
-    @Test("Description")
-    func description() throws {
+    @Test
+    func `Description`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 64)
         try bits.append(true)
         try bits.append(false)
@@ -161,8 +161,8 @@ extension BitVectorBoundedTests.Unit {
 // MARK: - Edge Cases
 
 extension BitVectorBoundedTests.EdgeCase {
-    @Test("Word boundary")
-    func wordBoundary() throws {
+    @Test
+    func `Word boundary`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 128, repeating: false, count: 100)
 
         bits[63] = true
@@ -174,8 +174,8 @@ extension BitVectorBoundedTests.EdgeCase {
         #expect(bits[65] == false)
     }
 
-    @Test("Bounds error")
-    func boundsError() throws {
+    @Test
+    func `Bounds error`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 64, repeating: false, count: 5)
 
         #expect(throws: __BitVectorBoundedError.self) {
@@ -183,8 +183,8 @@ extension BitVectorBoundedTests.EdgeCase {
         }
     }
 
-    @Test("Full capacity")
-    func fullCapacity() throws {
+    @Test
+    func `Full capacity`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 2)
         try bits.append(true)
         try bits.append(true)

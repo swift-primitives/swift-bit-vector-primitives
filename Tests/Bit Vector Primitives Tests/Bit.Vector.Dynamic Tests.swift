@@ -21,8 +21,8 @@ enum BitVectorDynamicTests {
 // MARK: - Unit Tests
 
 extension BitVectorDynamicTests.Unit {
-    @Test("Append and subscript")
-    func appendAndSubscript() {
+    @Test
+    func `Append and subscript`() {
         var bits = Bit.Vector.Dynamic()
 
         bits.append(true)
@@ -35,8 +35,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits.count == 3)
     }
 
-    @Test("Subscript set")
-    func subscriptSet() {
+    @Test
+    func `Subscript set`() {
         var bits = Bit.Vector.Dynamic([true, true, true])
 
         bits[1] = false
@@ -46,8 +46,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits[2] == true)
     }
 
-    @Test("popLast")
-    func popLast() {
+    @Test
+    func `popLast`() {
         var bits = Bit.Vector.Dynamic([true, false, true])
 
         let last = bits.popLast()
@@ -66,8 +66,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(empty == nil)
     }
 
-    @Test("removeLast")
-    func removeLast() {
+    @Test
+    func `removeLast`() {
         var bits = Bit.Vector.Dynamic([true, false])
 
         bits.removeLast()
@@ -75,16 +75,16 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits[0] == true)
     }
 
-    @Test("removeAll")
-    func removeAll() {
+    @Test
+    func `removeAll`() {
         var bits = Bit.Vector.Dynamic([true, false, true])
 
         bits.removeAll()
         #expect(bits.isEmpty)
     }
 
-    @Test("count and isEmpty")
-    func countAndIsEmpty() {
+    @Test
+    func `count and isEmpty`() {
         var bits = Bit.Vector.Dynamic()
         #expect(bits.isEmpty)
 
@@ -93,8 +93,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(!bits.isEmpty)
     }
 
-    @Test("first and last")
-    func firstAndLast() {
+    @Test
+    func `first and last`() {
         var bits = Bit.Vector.Dynamic()
         #expect(bits.first == nil)
         #expect(bits.last == nil)
@@ -108,8 +108,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits.last == false)
     }
 
-    @Test("Init from Bool sequence")
-    func initFromSequence() {
+    @Test
+    func `Init from Bool sequence`() {
         let bits = Bit.Vector.Dynamic([true, false, true, false])
 
         #expect(bits.count == 4)
@@ -119,8 +119,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits[3] == false)
     }
 
-    @Test("Init repeating true")
-    func initRepeatingTrue() {
+    @Test
+    func `Init repeating true`() {
         let bits = Bit.Vector.Dynamic(repeating: true, count: 5)
 
         #expect(bits.count == 5)
@@ -130,8 +130,8 @@ extension BitVectorDynamicTests.Unit {
         }
     }
 
-    @Test("Init repeating false")
-    func initRepeatingFalse() {
+    @Test
+    func `Init repeating false`() {
         let bits = Bit.Vector.Dynamic(repeating: false, count: 5)
 
         #expect(bits.count == 5)
@@ -141,8 +141,8 @@ extension BitVectorDynamicTests.Unit {
         }
     }
 
-    @Test("toggle")
-    func toggle() throws {
+    @Test
+    func `toggle`() throws {
         var bits = Bit.Vector.Dynamic([true, false, true])
 
         try bits.toggle(0)
@@ -154,16 +154,16 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits[2] == false)
     }
 
-    @Test("statistic.true and statistic.false")
-    func statisticTrueAndFalse() {
+    @Test
+    func `statistic.true and statistic.false`() {
         let bits = Bit.Vector.Dynamic([true, false, true, false, true])
 
         #expect(bits.statistic.true == 3)
         #expect(bits.statistic.false == 2)
     }
 
-    @Test("all.true and all.false")
-    func allTrueAndAllFalse() {
+    @Test
+    func `all.true and all.false`() {
         let allTrue = Bit.Vector.Dynamic([true, true, true])
         let allFalse = Bit.Vector.Dynamic([false, false, false])
         let mixed = Bit.Vector.Dynamic([true, false, true])
@@ -178,8 +178,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(!mixed.all.false)
     }
 
-    @Test("Iteration")
-    func iteration() {
+    @Test
+    func `Iteration`() {
         let bits = Bit.Vector.Dynamic([true, false, true, false])
 
         var values: [Bool] = []
@@ -190,8 +190,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(values == [true, false, true, false])
     }
 
-    @Test("Equality")
-    func equality() {
+    @Test
+    func `Equality`() {
         let a = Bit.Vector.Dynamic([true, false, true])
         let b = Bit.Vector.Dynamic([true, false, true])
         let c = Bit.Vector.Dynamic([true, true, true])
@@ -200,16 +200,16 @@ extension BitVectorDynamicTests.Unit {
         #expect(a != c)
     }
 
-    @Test("Description")
-    func description() {
+    @Test
+    func `Description`() {
         let bits = Bit.Vector.Dynamic([true, false, true])
         let desc = bits.description
         #expect(desc.contains("Bit.Vector.Dynamic"))
         #expect(desc.contains("101"))
     }
 
-    @Test("Append Bit type")
-    func appendBitType() {
+    @Test
+    func `Append Bit type`() {
         var bits = Bit.Vector.Dynamic()
         bits.append(Bit.one)
         bits.append(Bit.zero)
@@ -221,8 +221,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits[2] == true)
     }
 
-    @Test("Resize grow")
-    func resizeGrow() {
+    @Test
+    func `Resize grow`() {
         var bits = Bit.Vector.Dynamic([true, false])
         bits.resize(to: 5, fill: true)
 
@@ -234,8 +234,8 @@ extension BitVectorDynamicTests.Unit {
         #expect(bits[4] == true)
     }
 
-    @Test("Resize shrink")
-    func resizeShrink() {
+    @Test
+    func `Resize shrink`() {
         var bits = Bit.Vector.Dynamic([true, false, true, false, true])
         bits.resize(to: 2)
 
@@ -248,22 +248,22 @@ extension BitVectorDynamicTests.Unit {
 // MARK: - Edge Cases
 
 extension BitVectorDynamicTests.EdgeCase {
-    @Test("Empty arrays equal")
-    func emptyArraysEqual() {
+    @Test
+    func `Empty arrays equal`() {
         let a = Bit.Vector.Dynamic()
         let b = Bit.Vector.Dynamic()
         #expect(a == b)
     }
 
-    @Test("Different lengths not equal")
-    func differentLengthsNotEqual() {
+    @Test
+    func `Different lengths not equal`() {
         let a = Bit.Vector.Dynamic([true, false])
         let b = Bit.Vector.Dynamic([true, false, true])
         #expect(a != b)
     }
 
-    @Test("Word boundary: index 63 and 64")
-    func wordBoundary63And64() {
+    @Test
+    func `Word boundary: index 63 and 64`() {
         var bits = Bit.Vector.Dynamic(repeating: false, count: 100)
 
         bits[63] = true
@@ -275,8 +275,8 @@ extension BitVectorDynamicTests.EdgeCase {
         #expect(bits[65] == false)
     }
 
-    @Test("Large array")
-    func largeArray() {
+    @Test
+    func `Large array`() {
         var bits = Bit.Vector.Dynamic(repeating: false, count: 1000)
 
         bits[0] = true

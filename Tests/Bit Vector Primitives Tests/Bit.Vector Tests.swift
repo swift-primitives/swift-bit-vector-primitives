@@ -15,16 +15,16 @@ import Bit_Vector_Primitives_Test_Support
 
 @Suite("Bit.Vector Tests")
 struct BitVectorTests {
-    @Test("Create empty vector")
-    func createEmpty() {
+    @Test
+    func `Create empty vector`() {
         let bits = Bit.Vector(capacity: .zero)
         #expect(bits.capacity == .zero)
         #expect(bits.isEmpty == true)
         #expect(bits.popcount == .zero)
     }
 
-    @Test("Create and access bits")
-    func createAndAccess() {
+    @Test
+    func `Create and access bits`() {
         let capacity: Bit.Index.Count = 100
         let bits = Bit.Vector(capacity: capacity)
         #expect(bits.capacity == capacity)
@@ -43,8 +43,8 @@ struct BitVectorTests {
         #expect(bits.popcount == expectedPopcount)
     }
 
-    @Test("Clear all bits")
-    func clearAll() {
+    @Test
+    func `Clear all bits`() {
         let capacity: Bit.Index.Count = 128
         var bits = Bit.Vector(capacity: capacity)
 
@@ -60,8 +60,8 @@ struct BitVectorTests {
         #expect(bits.popcount == .zero)
     }
 
-    @Test("Set all bits")
-    func setAll() {
+    @Test
+    func `Set all bits`() {
         let capacity: Bit.Index.Count = 100
         var bits = Bit.Vector(capacity: capacity)
         bits.set.all()
@@ -69,8 +69,8 @@ struct BitVectorTests {
         #expect(bits.isFull == true)
     }
 
-    @Test("Iterate set bits")
-    func iterateSetBits() {
+    @Test
+    func `Iterate set bits`() {
         let capacity: Bit.Index.Count = 200
         let bits = Bit.Vector(capacity: capacity)
 
@@ -93,8 +93,8 @@ struct BitVectorTests {
 
 @Suite("Bit.Vector.Static Tests")
 struct BitVectorStaticTests {
-    @Test("Static capacity")
-    func staticCapacity() {
+    @Test
+    func `Static capacity`() {
         var bits = Bit.Vector.Static<2>()
         let expectedCapacity: Bit.Index.Count = 128
         #expect(Bit.Vector.Static<2>.capacity == expectedCapacity)
@@ -107,8 +107,8 @@ struct BitVectorStaticTests {
         #expect(bits.popcount == expectedPopcount)
     }
 
-    @Test("Static is copyable")
-    func staticIsCopyable() {
+    @Test
+    func `Static is copyable`() {
         var original = Bit.Vector.Static<1>()
 
         original[0] = true
@@ -124,8 +124,8 @@ struct BitVectorStaticTests {
         #expect(copy[0] == true)
     }
 
-    @Test("set.range single word")
-    func setRangeSingleWord() {
+    @Test
+    func `set.range single word`() {
         var bits = Bit.Vector.Static<4>()
         let lower: Bit.Index = 3
         let upper: Bit.Index = 7
@@ -142,8 +142,8 @@ struct BitVectorStaticTests {
         #expect(bits.popcount == expectedPopcount)
     }
 
-    @Test("set.range multi word")
-    func setRangeMultiWord() {
+    @Test
+    func `set.range multi word`() {
         var bits = Bit.Vector.Static<4>()
         let lower: Bit.Index = 60
         let upper: Bit.Index = 130
@@ -160,16 +160,16 @@ struct BitVectorStaticTests {
         #expect(bits.popcount == expectedPopcount)
     }
 
-    @Test("set.range empty range")
-    func setRangeEmpty() {
+    @Test
+    func `set.range empty range`() {
         var bits = Bit.Vector.Static<4>()
         let lower: Bit.Index = 5
         bits.set.range(lower ..< lower)
         #expect(bits.isEmpty == true)
     }
 
-    @Test("set.range full word boundary")
-    func setRangeWordBoundary() {
+    @Test
+    func `set.range full word boundary`() {
         var bits = Bit.Vector.Static<4>()
         let lower: Bit.Index = 0
         let upper: Bit.Index = 64
@@ -182,8 +182,8 @@ struct BitVectorStaticTests {
         #expect(bits[64] == false)
     }
 
-    @Test("clear.range single word")
-    func clearRangeSingleWord() {
+    @Test
+    func `clear.range single word`() {
         var bits = Bit.Vector.Static<4>()
         bits.set.all()
 
@@ -200,8 +200,8 @@ struct BitVectorStaticTests {
         #expect(bits.popcount == expectedPopcount)
     }
 
-    @Test("clear.range multi word")
-    func clearRangeMultiWord() {
+    @Test
+    func `clear.range multi word`() {
         var bits = Bit.Vector.Static<4>()
         bits.set.all()
 
@@ -219,8 +219,8 @@ struct BitVectorStaticTests {
         #expect(bits.popcount == expectedPopcount)
     }
 
-    @Test("set.range then clear.range roundtrip")
-    func setThenClearRoundtrip() {
+    @Test
+    func `set.range then clear.range roundtrip`() {
         var bits = Bit.Vector.Static<4>()
         let lower: Bit.Index = 0
         let upper: Bit.Index = 100
@@ -233,8 +233,8 @@ struct BitVectorStaticTests {
         #expect(bits.isEmpty == true)
     }
 
-    @Test("set.range single bit")
-    func setRangeSingleBit() {
+    @Test
+    func `set.range single bit`() {
         var bits = Bit.Vector.Static<4>()
         let lower: Bit.Index = 42
         let upper: Bit.Index = 43
@@ -248,8 +248,8 @@ struct BitVectorStaticTests {
         #expect(bits.popcount == expectedPopcount)
     }
 
-    @Test("set.range preserves existing bits")
-    func setRangePreservesExisting() {
+    @Test
+    func `set.range preserves existing bits`() {
         var bits = Bit.Vector.Static<4>()
         bits[0] = true
         bits[200] = true
