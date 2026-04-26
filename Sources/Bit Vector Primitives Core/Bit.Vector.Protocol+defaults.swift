@@ -174,7 +174,7 @@ extension Property.View where Tag == Bit.Vector.Pop, Base: Bit.Vector.`Protocol`
     /// - Complexity: O(words) per call, O(words * popcount) total for full drain.
     @inlinable
     public func first() -> Bit.Index? {
-        unsafe base.pointee.popFirst()
+        unsafe base.value.popFirst()
     }
 }
 
@@ -182,7 +182,7 @@ extension Property.View where Tag == Bit.Vector.Set, Base: Bit.Vector.`Protocol`
     /// Sets all bits to true.
     @inlinable
     public mutating func all() {
-        unsafe Base.setAll(&base.pointee)
+        unsafe Base.setAll(&base.value)
     }
 }
 
@@ -190,7 +190,7 @@ extension Property.View where Tag == Bit.Vector.Clear, Base: Bit.Vector.`Protoco
     /// Clears all bits to false.
     @inlinable
     public mutating func all() {
-        unsafe Base.clearAll(&base.pointee)
+        unsafe Base.clearAll(&base.value)
     }
 }
 

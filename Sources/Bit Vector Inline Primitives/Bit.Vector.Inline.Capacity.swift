@@ -36,7 +36,7 @@ where Tag == Bit.Vector.Inline<n>.Capacity, Base == Bit.Vector.Inline<n>, Elemen
     /// The number of remaining slots.
     @inlinable
     public var remaining: Bit.Index.Count {
-        let count = unsafe base.pointee._count
+        let count = unsafe base.value._count
         return Bit.Vector.Inline<n>._capacity.subtract.saturating(count)
     }
 }

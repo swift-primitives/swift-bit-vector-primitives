@@ -31,9 +31,9 @@ extension Property.View.Typed.Valued
 where Tag == Bit.Vector.Inline<n>.Statistic, Base == Bit.Vector.Inline<n>, Element == Bit {
     /// The number of `true` bits.
     @inlinable
-    public var `true`: Bit.Index.Count { unsafe base.pointee.popcount }
+    public var `true`: Bit.Index.Count { unsafe base.value.popcount }
 
     /// The number of `false` bits.
     @inlinable
-    public var `false`: Bit.Index.Count { unsafe base.pointee._count.subtract.saturating(base.pointee.popcount) }
+    public var `false`: Bit.Index.Count { unsafe base.value._count.subtract.saturating(base.value.popcount) }
 }

@@ -43,8 +43,8 @@ extension Property.View where Tag == Bit.Vector.Dynamic.Toggle, Base == Bit.Vect
     /// Toggles the bit at index and returns the new value.
     @inlinable
     public func returning(_ index: Bit.Index) throws(Bit.Vector.Dynamic.Error) -> Bool {
-        try unsafe base.pointee.toggle(index)
-        return try unsafe base.pointee.get(index)
+        try unsafe base.value.toggle(index)
+        return try unsafe base.value.get(index)
     }
 }
 
@@ -54,8 +54,8 @@ extension Property.View where Tag == Bit.Vector.Set, Base == Bit.Vector.Dynamic 
     /// Sets the bit at index and returns the previous value.
     @inlinable
     public func returning(_ index: Bit.Index) throws(Bit.Vector.Dynamic.Error) -> Bool {
-        let previous = try unsafe base.pointee.get(index)
-        try unsafe base.pointee.set(index)
+        let previous = try unsafe base.value.get(index)
+        try unsafe base.value.set(index)
         return previous
     }
 }
@@ -66,8 +66,8 @@ extension Property.View where Tag == Bit.Vector.Clear, Base == Bit.Vector.Dynami
     /// Clears the bit at index and returns the previous value.
     @inlinable
     public func returning(_ index: Bit.Index) throws(Bit.Vector.Dynamic.Error) -> Bool {
-        let previous = try unsafe base.pointee.get(index)
-        try unsafe base.pointee.clear(index)
+        let previous = try unsafe base.value.get(index)
+        try unsafe base.value.clear(index)
         return previous
     }
 }

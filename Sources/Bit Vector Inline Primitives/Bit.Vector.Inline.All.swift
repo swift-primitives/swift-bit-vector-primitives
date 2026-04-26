@@ -32,7 +32,7 @@ where Tag == Bit.Vector.Inline<n>.All, Base == Bit.Vector.Inline<n>, Element == 
     /// Whether all bits are `true`.
     @inlinable
     public var `true`: Bool {
-        let base = unsafe base.pointee
+        let base = unsafe base.value
         guard base._count > .zero else { return true }
         return base.popcount == base._count
     }
@@ -40,6 +40,6 @@ where Tag == Bit.Vector.Inline<n>.All, Base == Bit.Vector.Inline<n>, Element == 
     /// Whether all bits are `false`.
     @inlinable
     public var `false`: Bool {
-        unsafe base.pointee.popcount == .zero
+        unsafe base.value.popcount == .zero
     }
 }

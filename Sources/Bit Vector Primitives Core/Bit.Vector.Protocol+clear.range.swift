@@ -37,18 +37,18 @@ extension Property.View where Tag == Bit.Vector.Clear, Base: Bit.Vector.`Protoco
         let highMask: UInt = ~0 >> highShift
 
         if startWord == endWord {
-            let current = unsafe base.pointee.word(at: startWord)
-            unsafe base.pointee.setWord(at: startWord, to: current & ~(lowMask & highMask))
+            let current = unsafe base.value.word(at: startWord)
+            unsafe base.value.setWord(at: startWord, to: current & ~(lowMask & highMask))
         } else {
-            let startCurrent = unsafe base.pointee.word(at: startWord)
-            unsafe base.pointee.setWord(at: startWord, to: startCurrent & ~lowMask)
+            let startCurrent = unsafe base.value.word(at: startWord)
+            unsafe base.value.setWord(at: startWord, to: startCurrent & ~lowMask)
             var w = startWord + 1
             while w < endWord {
-                unsafe base.pointee.setWord(at: w, to: 0)
+                unsafe base.value.setWord(at: w, to: 0)
                 w += 1
             }
-            let endCurrent = unsafe base.pointee.word(at: endWord)
-            unsafe base.pointee.setWord(at: endWord, to: endCurrent & ~highMask)
+            let endCurrent = unsafe base.value.word(at: endWord)
+            unsafe base.value.setWord(at: endWord, to: endCurrent & ~highMask)
         }
     }
 }

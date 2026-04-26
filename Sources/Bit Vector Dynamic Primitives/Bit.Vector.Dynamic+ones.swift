@@ -36,8 +36,8 @@ extension Property.View where Tag == Bit.Vector.Ones, Base == Bit.Vector.Dynamic
     /// Iterates over indices of set (true) bits.
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
-        let storage = unsafe base.pointee._storage
-        let count = unsafe base.pointee._count
+        let storage = unsafe base.value._storage
+        let count = unsafe base.value._count
         let countInt = Int(clamping: count)
         let bitsPerWord = UInt.bitWidth
 
