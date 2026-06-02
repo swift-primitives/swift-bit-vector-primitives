@@ -1,0 +1,58 @@
+{
+  "$schema": "https://swift-institute.org/schemas/experiments-index-v1.json",
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-04-18",
+  "title": "Experiments Index",
+  "blurb": "Experiments for swift-bit-vector-primitives.",
+  "scope": "swift-bit-vector-primitives (swift-primitives)",
+  "experiments": [
+    {
+      "directory": "sequence-protocol-conformance",
+      "displayName": "sequence-protocol-conformance",
+      "purpose": "Validate Sequence.Protocol + Swift.Sequence conformance for ones iteration",
+      "date": "2026-02-06",
+      "toolchain": "swift-DEVELOPMENT-SNAPSHOT-2026-01-18-a",
+      "status": "SUPERSEDED",
+      "statusDetail": "API/package drift; experiment premise no longer expressible against current toolchain or peer-package API",
+      "statusRaw": "SUPERSEDED (Phase 7a 2026-04-30; previously CONFIRMED)",
+      "supersededBy": null,
+      "crossRefs": []
+    },
+    {
+      "directory": "bit-vector-protocol",
+      "displayName": "bit-vector-protocol",
+      "purpose": "Validate ~Copyable protocol for unifying popcount/ones/popFirst/clearAll/setAll across all Bit.Vector variants",
+      "date": "2026-02-12",
+      "toolchain": "Apple Swift 6.2.3",
+      "status": "CONFIRMED",
+      "statusDetail": null,
+      "statusRaw": "CONFIRMED",
+      "supersededBy": null,
+      "crossRefs": []
+    },
+    {
+      "directory": "property-view-protocol-constraint",
+      "displayName": "property-view-protocol-constraint",
+      "purpose": "Validate Property.View extensions with protocol constraints (Base: Protocol & ~Copyable) instead of concrete type constraints",
+      "date": "2026-02-12",
+      "toolchain": "swift-DEVELOPMENT-SNAPSHOT-2026-02-11-a",
+      "status": "CONFIRMED",
+      "statusDetail": null,
+      "statusRaw": "CONFIRMED",
+      "supersededBy": null,
+      "crossRefs": []
+    },
+    {
+      "directory": "iterator-struct-storage",
+      "displayName": "iterator-struct-storage",
+      "purpose": "Validate bitmap iterator works when stored as struct property (all 9 variants pass — original failure was stale build artifact)",
+      "date": "2026-02-24",
+      "toolchain": "swift-DEVELOPMENT-SNAPSHOT-2026-02-21-a",
+      "status": "CONFIRMED",
+      "statusDetail": "(stale build)",
+      "statusRaw": "CONFIRMED (stale build)",
+      "supersededBy": null,
+      "crossRefs": []
+    }
+  ]
+}

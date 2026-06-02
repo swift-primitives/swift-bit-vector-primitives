@@ -1,0 +1,22 @@
+// ===----------------------------------------------------------------------===//
+//
+// This source file is part of the swift-primitives open source project
+//
+// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
+// Licensed under Apache License v2.0
+//
+// See LICENSE for license information
+//
+// ===----------------------------------------------------------------------===//
+
+extension Bit.Vector.Bounded {
+    /// A sequence of clear-bit indices.
+    ///
+    /// Returns a `Bit.Vector.Zeros.Bounded` that copies the word storage
+    /// and conforms to `Swift.Sequence`, providing `forEach`, `map`,
+    /// `filter`, `for-in`, and all stdlib sequence algorithms.
+    @inlinable
+    public var zeros: Bit.Vector.Zeros.Bounded {
+        Bit.Vector.Zeros.Bounded(storage: _storage, capacity: _capacity)
+    }
+}

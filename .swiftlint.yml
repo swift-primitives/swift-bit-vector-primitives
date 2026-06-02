@@ -1,0 +1,12 @@
+# SwiftLint configuration
+# Inherits from the shared parent configuration in swift-standards
+
+parent_config: https://raw.githubusercontent.com/swift-primitives/.github/main/.swiftlint.yml
+
+# Package-specific overrides
+disabled_rules:
+  - function_parameter_count
+  # empty_count false-positives on the institute's typed-count metadata idiom
+  # (count == 0 where the type is not a Collection). Relaxed per principal decision 2026-06-02.
+  - empty_count
+  - comma   # reason: swift-format strips the space inside @_implements(Iterable,Iterator); swiftlint's comma rule and swift-format are irreconcilable here and swift-format is authoritative. Per principal 2026-06-02.
