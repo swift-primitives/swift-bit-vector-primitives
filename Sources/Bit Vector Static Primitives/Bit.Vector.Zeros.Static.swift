@@ -9,6 +9,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
+import Affine_Primitives
 public import Iterator_Chunk_Primitives
 public import Iterator_Primitive
 import Sequence_Primitives
