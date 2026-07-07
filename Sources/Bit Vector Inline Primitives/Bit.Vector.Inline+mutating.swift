@@ -16,7 +16,7 @@ import Affine_Primitives
 extension Bit.Vector.Inline {
     /// Sets the bit at the given index to true.
     @inlinable
-    public mutating func set(_ index: Bit.Index) throws(Bit.Vector.Inline.Error) {
+    public mutating func set(_ index: Bit.Index) throws(Self.Error) {
         guard index < _count else {
             throw .bounds(index: index, count: _count)
         }
@@ -26,7 +26,7 @@ extension Bit.Vector.Inline {
 
     /// Clears the bit at the given index to false.
     @inlinable
-    public mutating func clear(_ index: Bit.Index) throws(Bit.Vector.Inline.Error) {
+    public mutating func clear(_ index: Bit.Index) throws(Self.Error) {
         guard index < _count else {
             throw .bounds(index: index, count: _count)
         }
@@ -36,7 +36,7 @@ extension Bit.Vector.Inline {
 
     /// Toggles the bit at the given index.
     @inlinable
-    public mutating func toggle(_ index: Bit.Index) throws(Bit.Vector.Inline.Error) {
+    public mutating func toggle(_ index: Bit.Index) throws(Self.Error) {
         guard index < _count else {
             throw .bounds(index: index, count: _count)
         }

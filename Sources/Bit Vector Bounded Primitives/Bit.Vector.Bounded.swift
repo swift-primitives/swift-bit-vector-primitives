@@ -161,7 +161,7 @@ extension Bit.Vector.Bounded {
 
     /// Returns the bit at the given index, throwing on bounds violation.
     @inlinable
-    public func get(_ index: Bit.Index) throws(Bit.Vector.Bounded.Error) -> Bool {
+    public func get(_ index: Bit.Index) throws(Self.Error) -> Bool {
         guard index < _count else {
             throw .bounds(index: index, count: _count)
         }

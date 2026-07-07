@@ -11,6 +11,9 @@
 
 // MARK: - Bit.Vector: Bit.Vector.Protocol
 
+// reason: conformance clause — `Self` is invalid here (the extension's
+// inheritance clause establishes what Self even is; svg 60e00fd precedent).
+// swiftlint:disable:next prefer_self_in_static_references
 extension Bit.Vector: Bit.Vector.`Protocol` {
     /// The capacity in bits.
     @inlinable

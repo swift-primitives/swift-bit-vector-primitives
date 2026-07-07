@@ -18,7 +18,7 @@ extension Bit.Vector.Inline {
     ///
     /// - Throws: `Error.overflow` if at capacity.
     @inlinable
-    public mutating func append(_ value: Bool) throws(Bit.Vector.Inline.Error) {
+    public mutating func append(_ value: Bool) throws(Self.Error) {
         guard _count < Self._capacity else {
             throw .overflow
         }
@@ -33,7 +33,7 @@ extension Bit.Vector.Inline {
     ///
     /// - Throws: `Error.overflow` if at capacity.
     @inlinable
-    public mutating func append(_ bit: Bit) throws(Bit.Vector.Inline.Error) {
+    public mutating func append(_ bit: Bit) throws(Self.Error) {
         try append(Bool(bit))
     }
 
