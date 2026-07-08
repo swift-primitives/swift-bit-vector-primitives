@@ -100,9 +100,14 @@ extension Bit.Vector {
             }
         }
 
-        /// Errors that can occur during operations.
-        public typealias Error = __BitVectorBoundedError
     }
+}
+
+// MARK: - Errors
+
+extension Bit.Vector.Bounded {
+    /// Errors that can occur during operations.
+    public typealias Error = __BitVectorBoundedError
 }
 
 // MARK: - Properties

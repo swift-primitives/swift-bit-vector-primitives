@@ -13,10 +13,12 @@ import Property_Primitives
 
 extension Bit.Vector.Inline {
     /// Tag type for `all.true`/`all.false` property accessors.
-    public enum All: Sendable {
-        /// The mutating property-view type for `all` accessors.
-        public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
-    }
+    public enum All: Sendable {}
+}
+
+extension Bit.Vector.Inline.All {
+    /// The mutating property-view type for `all` accessors.
+    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
 }
 
 // MARK: - Property: all.true / all.false

@@ -46,28 +46,30 @@ extension Bit.Vector.Ones.Inline {
                 self._currentWord = 0
             }
         }
+    }
+}
 
-        /// Advances to and returns the next index, or `nil` when exhausted.
-        @inlinable
-        public mutating func next() -> Bit.Index? {
-            // Advance to next word with set bits
-            while _currentWord == 0 {
-                _wordIndex += 1
-                guard _wordIndex < wordCount else { return nil }
-                _currentWord = _storage[_wordIndex]
-            }
-
-            // Wegner/Kernighan: extract lowest set bit
-            let bitPosition = _currentWord.trailingZeroBitCount
-            _currentWord &= _currentWord &- 1
-
-            // Compute global bit index via pack location
-            let wordCount = Index_Primitives.Index<UInt>.Count(Cardinal(UInt(_wordIndex)))
-            let baseBitCount = wordCount * .bitsPerWord
-            let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
-
-            guard globalIndex < _capacity else { return nil }
-            return globalIndex
+extension Bit.Vector.Ones.Inline.Iterator {
+    /// Advances to and returns the next index, or `nil` when exhausted.
+    @inlinable
+    public mutating func next() -> Bit.Index? {
+        // Advance to next word with set bits
+        while _currentWord == 0 {
+            _wordIndex += 1
+            guard _wordIndex < wordCount else { return nil }
+            _currentWord = _storage[_wordIndex]
         }
+
+        // Wegner/Kernighan: extract lowest set bit
+        let bitPosition = _currentWord.trailingZeroBitCount
+        _currentWord &= _currentWord &- 1
+
+        // Compute global bit index via pack location
+        let wordCount = Index_Primitives.Index<UInt>.Count(Cardinal(UInt(_wordIndex)))
+        let baseBitCount = wordCount * .bitsPerWord
+        let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+
+        guard globalIndex < _capacity else { return nil }
+        return globalIndex
     }
 }

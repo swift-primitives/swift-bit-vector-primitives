@@ -50,29 +50,31 @@ extension Bit.Vector.Zeros.View {
                 self._currentWord = 0
             }
         }
+    }
+}
 
-        /// Advances to and returns the next index, or `nil` when exhausted.
-        @inlinable
-        public mutating func next() -> Bit.Index? {
-            // Advance to next word with clear bits
-            while _currentWord == 0 {
-                let next = _wordIndex.successor.saturating()
-                guard next < _wordCount else { return nil }
-                _wordIndex = next
-                unsafe _currentWord = ~_words[_wordIndex]
-            }
-
-            // Wegner/Kernighan: extract lowest set bit of complemented word
-            let bitPosition = _currentWord.trailingZeroBitCount
-            _currentWord &= _currentWord &- 1
-
-            // Compute global bit index via pack location
-            let wordAsCount = Index_Primitives.Index<UInt>.Count(_wordIndex)
-            let baseBitCount = wordAsCount * .bitsPerWord
-            let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
-
-            guard globalIndex < _capacity else { return nil }
-            return globalIndex
+extension Bit.Vector.Zeros.View.Iterator {
+    /// Advances to and returns the next index, or `nil` when exhausted.
+    @inlinable
+    public mutating func next() -> Bit.Index? {
+        // Advance to next word with clear bits
+        while _currentWord == 0 {
+            let next = _wordIndex.successor.saturating()
+            guard next < _wordCount else { return nil }
+            _wordIndex = next
+            unsafe _currentWord = ~_words[_wordIndex]
         }
+
+        // Wegner/Kernighan: extract lowest set bit of complemented word
+        let bitPosition = _currentWord.trailingZeroBitCount
+        _currentWord &= _currentWord &- 1
+
+        // Compute global bit index via pack location
+        let wordAsCount = Index_Primitives.Index<UInt>.Count(_wordIndex)
+        let baseBitCount = wordAsCount * .bitsPerWord
+        let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+
+        guard globalIndex < _capacity else { return nil }
+        return globalIndex
     }
 }

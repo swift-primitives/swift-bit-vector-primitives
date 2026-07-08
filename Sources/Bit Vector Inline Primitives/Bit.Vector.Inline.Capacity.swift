@@ -13,10 +13,12 @@ import Property_Primitives
 
 extension Bit.Vector.Inline {
     /// Tag type for `capacity.maximum`/`capacity.remaining` property accessors.
-    public enum Capacity: Sendable {
-        /// The mutating property-view type for `capacity` accessors.
-        public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
-    }
+    public enum Capacity: Sendable {}
+}
+
+extension Bit.Vector.Inline.Capacity {
+    /// The mutating property-view type for `capacity` accessors.
+    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
 }
 
 // MARK: - Property: capacity.maximum / capacity.remaining

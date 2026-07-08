@@ -29,22 +29,24 @@ extension Bit.Vector.Inline: Swift.Sequence {
             self.count = count
             self.index = 0
         }
-
-        /// Advances to and returns the next bit, or `nil` when exhausted.
-        @inlinable
-        public mutating func next() -> Bool? {
-            guard index < count else { return nil }
-            let wordIndex = index / UInt.bitWidth
-            let bitIndex = index % UInt.bitWidth
-            let mask: UInt = 1 << bitIndex
-            defer { index += 1 }
-            return (storage[wordIndex] & mask) != 0
-        }
     }
 
     /// Returns an iterator over the bits.
     @inlinable
     public func makeIterator() -> Iterator {
         Iterator(storage: _storage, count: Int(clamping: _count))
+    }
+}
+
+extension Bit.Vector.Inline.Iterator {
+    /// Advances to and returns the next bit, or `nil` when exhausted.
+    @inlinable
+    public mutating func next() -> Bool? {
+        guard index < count else { return nil }
+        let wordIndex = index / UInt.bitWidth
+        let bitIndex = index % UInt.bitWidth
+        let mask: UInt = 1 << bitIndex
+        defer { index += 1 }
+        return (storage[wordIndex] & mask) != 0
     }
 }

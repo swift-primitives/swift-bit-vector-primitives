@@ -94,9 +94,14 @@ extension Bit.Vector {
             }
         }
 
-        /// Errors that can occur during operations.
-        public typealias Error = __BitVectorDynamicError
     }
+}
+
+// MARK: - Errors
+
+extension Bit.Vector.Dynamic {
+    /// Errors that can occur during operations.
+    public typealias Error = __BitVectorDynamicError
 }
 
 // MARK: - Properties

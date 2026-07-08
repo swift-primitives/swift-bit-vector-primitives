@@ -13,10 +13,12 @@ import Property_Primitives
 
 extension Bit.Vector.Inline {
     /// Tag type for `statistic.true`/`statistic.false` property accessors.
-    public enum Statistic: Sendable {
-        /// The mutating property-view type for `statistic` accessors.
-        public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
-    }
+    public enum Statistic: Sendable {}
+}
+
+extension Bit.Vector.Inline.Statistic {
+    /// The mutating property-view type for `statistic` accessors.
+    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
 }
 
 // MARK: - Property: statistic.true / statistic.false
