@@ -13,8 +13,9 @@ import Bit_Vector_Primitives
 import Bit_Vector_Primitives_Test_Support
 import Testing
 
-@Suite("Bit.Vector Tests")
-struct BitVectorTests {
+extension Bit.Vector {
+    @Suite("Bit.Vector Tests")
+    struct Test {
     @Test
     func `Create empty vector`() {
         let bits = Bit.Vector(capacity: .zero)
@@ -89,10 +90,10 @@ struct BitVectorTests {
         #expect(visited[1] == expected1)
         #expect(visited[2] == expected2)
     }
+    }
 }
 
-@Suite("Bit.Vector.Static Tests")
-struct BitVectorStaticTests {
+@Suite struct `Bit.Vector.Static Tests` {
     @Test
     func `Static capacity`() {
         var bits = Bit.Vector.Static<2>()
