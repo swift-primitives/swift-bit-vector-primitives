@@ -15,7 +15,7 @@ import Testing
 
 enum BitVectorInlineTests {
     @Suite struct Unit {}
-    @Suite struct EdgeCase {}
+    @Suite struct `Edge Case` {}
 }
 
 // MARK: - Unit Tests
@@ -183,7 +183,7 @@ extension BitVectorInlineTests.Unit {
 
 // MARK: - Edge Cases
 
-extension BitVectorInlineTests.EdgeCase {
+extension BitVectorInlineTests.`Edge Case` {
     @Test
     func `Word boundary`() throws {
         var bits = try Bit.Vector.Inline<2>(count: 100)

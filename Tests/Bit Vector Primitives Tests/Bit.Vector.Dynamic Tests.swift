@@ -15,7 +15,7 @@ import Testing
 
 enum BitVectorDynamicTests {
     @Suite struct Unit {}
-    @Suite struct EdgeCase {}
+    @Suite struct `Edge Case` {}
 }
 
 // MARK: - Unit Tests
@@ -247,7 +247,7 @@ extension BitVectorDynamicTests.Unit {
 
 // MARK: - Edge Cases
 
-extension BitVectorDynamicTests.EdgeCase {
+extension BitVectorDynamicTests.`Edge Case` {
     @Test
     func `Empty arrays equal`() {
         let a = Bit.Vector.Dynamic()

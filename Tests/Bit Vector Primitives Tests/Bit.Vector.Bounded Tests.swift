@@ -15,7 +15,7 @@ import Testing
 
 enum BitVectorBoundedTests {
     @Suite struct Unit {}
-    @Suite struct EdgeCase {}
+    @Suite struct `Edge Case` {}
 }
 
 // MARK: - Unit Tests
@@ -160,7 +160,7 @@ extension BitVectorBoundedTests.Unit {
 
 // MARK: - Edge Cases
 
-extension BitVectorBoundedTests.EdgeCase {
+extension BitVectorBoundedTests.`Edge Case` {
     @Test
     func `Word boundary`() throws {
         var bits = try Bit.Vector.Bounded(capacity: 128, repeating: false, count: 100)
