@@ -16,80 +16,80 @@ import Testing
 extension Bit.Vector {
     @Suite("Bit.Vector Tests")
     struct Test {
-    @Test
-    func `Create empty vector`() {
-        let bits = Bit.Vector(capacity: .zero)
-        #expect(bits.capacity == .zero)
-        #expect(bits.isEmpty == true)
-        #expect(bits.popcount == .zero)
-    }
+        @Test
+        func `Create empty vector`() {
+            let bits = Bit.Vector(capacity: .zero)
+            #expect(bits.capacity == .zero)
+            #expect(bits.isEmpty == true)
+            #expect(bits.popcount == .zero)
+        }
 
-    @Test
-    func `Create and access bits`() {
-        let capacity: Bit.Index.Count = 100
-        let bits = Bit.Vector(capacity: capacity)
-        #expect(bits.capacity == capacity)
-        #expect(bits.isEmpty == true)
+        @Test
+        func `Create and access bits`() {
+            let capacity: Bit.Index.Count = 100
+            let bits = Bit.Vector(capacity: capacity)
+            #expect(bits.capacity == capacity)
+            #expect(bits.isEmpty == true)
 
-        bits[0] = true
-        bits[42] = true
-        bits[99] = true
+            bits[0] = true
+            bits[42] = true
+            bits[99] = true
 
-        #expect(bits[0] == true)
-        #expect(bits[1] == false)
-        #expect(bits[42] == true)
-        #expect(bits[99] == true)
+            #expect(bits[0] == true)
+            #expect(bits[1] == false)
+            #expect(bits[42] == true)
+            #expect(bits[99] == true)
 
-        let expectedPopcount: Bit.Index.Count = 3
-        #expect(bits.popcount == expectedPopcount)
-    }
+            let expectedPopcount: Bit.Index.Count = 3
+            #expect(bits.popcount == expectedPopcount)
+        }
 
-    @Test
-    func `Clear all bits`() {
-        let capacity: Bit.Index.Count = 128
-        var bits = Bit.Vector(capacity: capacity)
+        @Test
+        func `Clear all bits`() {
+            let capacity: Bit.Index.Count = 128
+            var bits = Bit.Vector(capacity: capacity)
 
-        bits[0] = true
-        bits[64] = true
-        bits[127] = true
+            bits[0] = true
+            bits[64] = true
+            bits[127] = true
 
-        let expectedPopcount: Bit.Index.Count = 3
-        #expect(bits.popcount == expectedPopcount)
+            let expectedPopcount: Bit.Index.Count = 3
+            #expect(bits.popcount == expectedPopcount)
 
-        bits.clear.all()
-        #expect(bits.isEmpty == true)
-        #expect(bits.popcount == .zero)
-    }
+            bits.clear.all()
+            #expect(bits.isEmpty == true)
+            #expect(bits.popcount == .zero)
+        }
 
-    @Test
-    func `Set all bits`() {
-        let capacity: Bit.Index.Count = 100
-        var bits = Bit.Vector(capacity: capacity)
-        bits.set.all()
-        #expect(bits.popcount == capacity)
-        #expect(bits.isFull == true)
-    }
+        @Test
+        func `Set all bits`() {
+            let capacity: Bit.Index.Count = 100
+            var bits = Bit.Vector(capacity: capacity)
+            bits.set.all()
+            #expect(bits.popcount == capacity)
+            #expect(bits.isFull == true)
+        }
 
-    @Test
-    func `Iterate set bits`() {
-        let capacity: Bit.Index.Count = 200
-        let bits = Bit.Vector(capacity: capacity)
+        @Test
+        func `Iterate set bits`() {
+            let capacity: Bit.Index.Count = 200
+            let bits = Bit.Vector(capacity: capacity)
 
-        bits[5] = true
-        bits[100] = true
-        bits[150] = true
+            bits[5] = true
+            bits[100] = true
+            bits[150] = true
 
-        var visited: [Bit.Index] = []
-        bits.ones.forEach { visited.append($0) }
+            var visited: [Bit.Index] = []
+            bits.ones.forEach { visited.append($0) }
 
-        #expect(visited.count == 3)
-        let expected0: Bit.Index = 5
-        let expected1: Bit.Index = 100
-        let expected2: Bit.Index = 150
-        #expect(visited[0] == expected0)
-        #expect(visited[1] == expected1)
-        #expect(visited[2] == expected2)
-    }
+            #expect(visited.count == 3)
+            let expected0: Bit.Index = 5
+            let expected1: Bit.Index = 100
+            let expected2: Bit.Index = 150
+            #expect(visited[0] == expected0)
+            #expect(visited[1] == expected1)
+            #expect(visited[2] == expected2)
+        }
     }
 }
 
