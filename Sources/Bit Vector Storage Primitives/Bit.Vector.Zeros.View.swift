@@ -18,11 +18,11 @@ extension Bit.Vector.Zeros {
     /// without requiring exclusive access. This enables `zeros.forEach` to work
     /// from non-mutating contexts (including `deinit`).
     @safe
-    // WHY: Category D — structural Sendable workaround (SP-5).
-    // WHY: Raw-pointer view. UnsafeMutablePointer blocks structural inference.
-    // WHEN TO REMOVE: When compiler gains structural Sendable through raw pointers.
-    // TRACKING: unsafe-audit-findings.md Category D SP-5.
-    public struct View: Copyable, @unchecked Sendable {
+    // WHY: Deliberately NOT `Sendable`. This view is a `Copyable` alias to the
+    // WHY: same base pointer as its owning `Bit.Vector`, freely obtainable from
+    // WHY: a borrow. A `Sendable` conformance here would defeat the removal of
+    // WHY: `Sendable` on `Bit.Vector` itself — see `Bit.Vector.swift`.
+    public struct View: Copyable {
         @usableFromInline
         let _words: UnsafeMutablePointer<UInt>
 

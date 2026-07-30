@@ -147,9 +147,14 @@ extension Bit.Vector {
 
 // MARK: - Sendable
 
-// WHY: Category D — structural Sendable workaround (SP-5).
-// WHY: Raw-pointer-backed Copyable type. UnsafeMutablePointer blocks structural
-// WHY: Sendable inference. The type itself does not own the allocation.
-// WHEN TO REMOVE: When compiler gains structural Sendable through raw pointers.
-// TRACKING: unsafe-audit-findings.md Category D SP-5.
-extension Bit.Vector: @unchecked Sendable {}
+// WHY: `Bit.Vector` is deliberately NOT `Sendable`. It solely owns a heap
+// WHY: allocation (`init` allocates, `deinit` deallocates) and exposes
+// WHY: `nonmutating` mutation — subscript `set`, `toggle(_:)`,
+// WHY: `withUnsafeMutableWords(_:)` — so a shared borrow is sufficient to write.
+// WHY: `Sendable` would admit exactly that sharing (a `let` global, or a `let`
+// WHY: property of a `Sendable` class) and the resulting concurrent writes would
+// WHY: carry no diagnostic. Cross-isolation ownership transfer does not need the
+// WHY: conformance: region isolation moves the value through `sending` /
+// WHY: `consuming` parameters. For a concurrently shared bitmap use a
+// WHY: value-semantic variant (`.Bounded`, `.Inline`, `.Static`, `.Dynamic`),
+// WHY: all of which are checked `Sendable`.
