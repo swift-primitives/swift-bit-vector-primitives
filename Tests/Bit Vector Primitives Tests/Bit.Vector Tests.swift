@@ -66,8 +66,25 @@ import Testing
 // `Iterator.next()`. The corrective: `Iterator` is now `Copyable, ~Escapable`
 // (dropping `Swift.IteratorProtocol`, keeping the `Iterator_Primitive.Iterator.
 // `Protocol`` conformance that supplies `next()`), `init(view:)` is tagged
-// `@_lifetime(copy view)`, and both `makeIterator()` and
-// `iterableMakeIterator()` are tagged `@_lifetime(copy self)`.
+// `@_lifetime(copy view)`, and `makeIterator()` is tagged `@_lifetime(copy
+// self)`.
+//
+// `iterableMakeIterator()` — the `@_implements(Iterable, makeIterator())`
+// witness — is tagged `@_lifetime(borrow self)`, matching `Iterable
+// .makeIterator()`'s own declared dependence exactly (and matching every
+// other `Iterable` conformer in the ecosystem, e.g. `Bit.Vector.Ones.Static` /
+// `.Inline`). An earlier revision (swift-primitives/swift-bit-vector
+// -primitives#5) used `@_lifetime(copy self)` on this witness instead, to
+// let `iterableMakeIterator()` be chained directly off an ephemeral `.ones`
+// temporary without rejecting the call — see the "Chained…" test below for
+// that scenario, now written against a named local instead. Apple Swift
+// 6.3.3 release accepted the mismatched `copy self` witness against the
+// `borrow self` requirement, but Swift 6.4.x-nightly and main-nightly
+// rejected the whole conformance (`type 'Bit.Vector.Ones.View' does not
+// conform to protocol 'Iterable'`) — an exact-kind-matching check on
+// `@_lifetime`-annotated witnesses that release does not yet enforce. Matching
+// the requirement's dependence kind exactly is the shape both toolchains
+// accept; the more permissive ephemeral-chaining convenience is not.
 //
 // Verified against the real package (Apple Swift 6.3.3, swift-6.3.3-RELEASE):
 // escape is now rejected by the mandatory SIL lifetime-dependence diagnostic
@@ -192,24 +209,32 @@ extension Bit.Vector {
             #expect(visited[1] == expected1)
         }
 
-        // Chained-form regression for the reopened #3 corrective: calling
-        // `iterableMakeIterator()` directly on the temporary `.ones` view
-        // (never binding the view to a local) must hold for the vector's
-        // whole lifetime under `@_lifetime(copy self)`. Under the prior
-        // `@_lifetime(borrow self)` spelling this rejected with "lifetime-
-        // dependent variable 'm' escapes its scope / it depends on the
-        // lifetime of this parent value" — the dependency bound to the
-        // ephemeral `.ones` temporary rather than forwarding through to what
-        // the view already depends on (the vector). Verified against the real
-        // package: this compiles clean under `copy self`.
+        // Regression for the reopened #3 corrective, now against a named
+        // local rather than the ephemeral `.ones` temporary (issue
+        // swift-primitives/swift-bit-vector-primitives#5): binding the view
+        // first and calling `iterableMakeIterator()` on it must hold for the
+        // vector's whole lifetime under `@_lifetime(borrow self)` — the
+        // dependence kind `Iterable.makeIterator()` itself declares, and the
+        // one every other `Iterable` conformer in the ecosystem uses.
+        // Calling `iterableMakeIterator()` directly on the unbound `.ones`
+        // temporary (`bits.ones.iterableMakeIterator()`) does NOT compile
+        // under `borrow self` — "lifetime-dependent variable 'm' escapes its
+        // scope" — because the borrow scope of an unnamed temporary ends at
+        // the end of the full expression; binding it to a local first (as
+        // below) gives the dependency a scope that outlives the call. This
+        // is the ordinary `~Escapable`-value discipline (bind before you
+        // chain), not a regression: see the file-level comment above for why
+        // `copy self` (which does admit the unbound-temporary form) is not
+        // the shape that both the 6.3 release and nightly toolchains accept.
         @Test
-        func `Chained iterableMakeIterator holds across the vector's lifetime`() {
+        func `iterableMakeIterator holds across the vector's lifetime`() {
             let capacity: Bit.Index.Count = 16
             var bits = Bit.Vector(capacity: capacity)
             bits[3] = true
             bits[9] = true
 
-            var m = bits.ones.iterableMakeIterator()
+            let onesView = bits.ones
+            var m = onesView.iterableMakeIterator()
             var visited: [Bit.Index] = []
             while true {
                 let span = m.next(maximumCount: Cardinal(UInt.max))

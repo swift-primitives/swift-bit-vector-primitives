@@ -25,7 +25,7 @@ extension Bit.Vector.Zeros.View: Iterable {
 
     /// Returns an iterator over the clear-bit indices.
     @inlinable
-    @_lifetime(copy self)
+    @_lifetime(borrow self)
     @_implements(Iterable,makeIterator())
     public borrowing func iterableMakeIterator() -> Iterator_Primitive.Iterator.Materializing<Iterator> {
         Iterator_Primitive.Iterator.Materializing(Iterator(view: copy self))
