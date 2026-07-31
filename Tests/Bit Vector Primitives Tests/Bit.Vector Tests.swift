@@ -151,6 +151,58 @@ extension Bit.Vector {
     }
 }
 
+// MARK: - #4: subscript bounds safety
+//
+// swift-primitives/swift-bit-vector-primitives#4 — the subscript performed no
+// bounds check while `toggle(_:)` did. Per the coordinator's ruled posture
+// (issue comment 5140090959, 2026-07-31): the subscript now adopts the same
+// checked posture `toggle(_:)` already has, and the declared `@safe` absorber
+// claim at the type's declaration stands unchanged.
+//
+// The out-of-bounds cases fork a child process (Swift Testing exit tests) so
+// the trap cannot bring down the parent test run; per the swift-span-primitives
+// `Span.Raw.Mutable+"Bounds Safety"` precedent this suite is `.serialized` to
+// avoid interleaving forks with concurrently running sibling tests.
+extension Bit.Vector {
+    @Suite(.serialized) struct `Bounds Safety` {
+        @Suite struct Unit {}
+        @Suite struct `Edge Case` {}
+    }
+}
+
+extension Bit.Vector.`Bounds Safety`.Unit {
+    @Test
+    func `subscript get at the last valid index does not trap`() {
+        let bits = Bit.Vector(capacity: 8)
+        #expect(bits[7] == false)
+    }
+
+    @Test
+    func `subscript set at the last valid index does not trap`() {
+        let bits = Bit.Vector(capacity: 8)
+        bits[7] = true
+        #expect(bits[7] == true)
+    }
+}
+
+extension Bit.Vector.`Bounds Safety`.`Edge Case` {
+    @Test
+    func `subscript get traps when index is out of bounds`() async {
+        await #expect(processExitsWith: .failure) {
+            let bits = Bit.Vector(capacity: 8)
+            _ = bits[8]
+        }
+    }
+
+    @Test
+    func `subscript set traps when index is out of bounds`() async {
+        await #expect(processExitsWith: .failure) {
+            let bits = Bit.Vector(capacity: 8)
+            bits[8] = true
+        }
+    }
+}
+
 @Suite struct `Bit.Vector.Static Tests` {
     @Test
     func `Static capacity`() {

@@ -92,14 +92,17 @@ extension Bit.Vector {
     /// Gets or sets the bit at the specified index.
     ///
     /// - Parameter index: The bit index. Must be in `0..<capacity`.
+    /// - Precondition: `index < capacity`.
     /// - Returns: `true` if the bit is set, `false` otherwise.
     @inlinable
     public subscript(index: Bit.Index) -> Bool {
         get {
+            precondition(index < capacity, "Index out of bounds")
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
             return unsafe (_words[location.word] & location.mask) != 0
         }
         nonmutating set {
+            precondition(index < capacity, "Index out of bounds")
             let location = Bit.Pack<UInt>.Location(index: index, bitsPerWord: .bitsPerWord)
             let current = unsafe _words[location.word]
             if newValue {
