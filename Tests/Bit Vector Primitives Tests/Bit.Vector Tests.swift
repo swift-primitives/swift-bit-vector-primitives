@@ -11,6 +11,9 @@
 
 import Bit_Vector_Primitives
 import Bit_Vector_Primitives_Test_Support
+import Cardinal_Primitives
+import Iterator_Chunk_Primitives
+import Iterator_Primitive
 import Testing
 
 // MARK: - #3 negative control: escaping `ones`/`zeros` past the vector must be rejected
@@ -52,6 +55,46 @@ import Testing
 // returning `Bit.Vector.Ones.View` with no parameter for it to depend on is
 // exactly the shape this comment documents as rejected, so it cannot live as
 // executable Swift in this file without breaking the build.
+
+// MARK: - #3 (reopened) negative control: escaping the scalar `Iterator` past
+// the vector must be rejected
+//
+// Residue of the fix above: `Bit.Vector.Ones.View.Iterator` / `Zeros.View.
+// Iterator` were fully `Escapable` (via `Swift.IteratorProtocol`, which pins
+// `Escapable`), so `v.ones.makeIterator()` could escape the vector with zero
+// diagnostics — ASan proved the resulting heap-use-after-free in
+// `Iterator.next()`. The corrective: `Iterator` is now `Copyable, ~Escapable`
+// (dropping `Swift.IteratorProtocol`, keeping the `Iterator_Primitive.Iterator.
+// `Protocol`` conformance that supplies `next()`), `init(view:)` is tagged
+// `@_lifetime(copy view)`, and both `makeIterator()` and
+// `iterableMakeIterator()` are tagged `@_lifetime(copy self)`.
+//
+// Verified against the real package (Apple Swift 6.3.3, swift-6.3.3-RELEASE):
+// escape is now rejected by the mandatory SIL lifetime-dependence diagnostic
+// pass — not by `-typecheck`, which passes this snippet clean (confirmed:
+// `swiftc -typecheck` against the built module emits nothing for the snippet
+// below; only `-emit-sil` / a real `swift build` surfaces the rejection).
+//
+// ```swift
+// // MUST NOT COMPILE. If this starts compiling clean, the scalar iterator
+// // has stopped being lifetime-dependent on its owning vector — the
+// // heap-use-after-free this reopening fixed has regressed.
+// func scalarIteratorEscape() {
+//     var iterator: Bit.Vector.Ones.View.Iterator
+//     do {
+//         let bits = Bit.Vector(capacity: 8)
+//         iterator = bits.ones.makeIterator()
+//     }
+//     _ = iterator.next()
+// }
+// // error: lifetime-dependent variable 'iterator' escapes its scope
+// //  note: it depends on the lifetime of variable 'bits'
+// //  note: this use of the lifetime-dependent value is out of scope
+// ```
+//
+// Do not uncomment this into a real, always-passing test: it is exactly the
+// escape shape the reopening fixed, so it cannot live as executable Swift in
+// this file without breaking the build.
 
 extension Bit.Vector {
     @Suite("Bit.Vector Tests")
@@ -145,6 +188,40 @@ extension Bit.Vector {
             #expect(visited.count == 8)
             let expected0: Bit.Index = 0
             let expected1: Bit.Index = 1
+            #expect(visited[0] == expected0)
+            #expect(visited[1] == expected1)
+        }
+
+        // Chained-form regression for the reopened #3 corrective: calling
+        // `iterableMakeIterator()` directly on the temporary `.ones` view
+        // (never binding the view to a local) must hold for the vector's
+        // whole lifetime under `@_lifetime(copy self)`. Under the prior
+        // `@_lifetime(borrow self)` spelling this rejected with "lifetime-
+        // dependent variable 'm' escapes its scope / it depends on the
+        // lifetime of this parent value" — the dependency bound to the
+        // ephemeral `.ones` temporary rather than forwarding through to what
+        // the view already depends on (the vector). Verified against the real
+        // package: this compiles clean under `copy self`.
+        @Test
+        func `Chained iterableMakeIterator holds across the vector's lifetime`() {
+            let capacity: Bit.Index.Count = 16
+            var bits = Bit.Vector(capacity: capacity)
+            bits[3] = true
+            bits[9] = true
+
+            var m = bits.ones.iterableMakeIterator()
+            var visited: [Bit.Index] = []
+            while true {
+                let span = m.next(maximumCount: Cardinal(UInt.max))
+                if span.isEmpty { break }
+                for index in span.indices {
+                    visited.append(span[index])
+                }
+            }
+
+            #expect(visited.count == 2)
+            let expected0: Bit.Index = 3
+            let expected1: Bit.Index = 9
             #expect(visited[0] == expected0)
             #expect(visited[1] == expected1)
         }

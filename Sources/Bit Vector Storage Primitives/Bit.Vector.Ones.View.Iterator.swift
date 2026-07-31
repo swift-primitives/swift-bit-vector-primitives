@@ -22,7 +22,7 @@ extension Bit.Vector.Ones.View {
     ///
     /// - Complexity: O(popcount) total across all `next()` calls.
     @safe
-    public struct Iterator: Iterator_Primitive.Iterator.`Protocol`, IteratorProtocol {
+    public struct Iterator: Iterator_Primitive.Iterator.`Protocol`, Copyable, ~Escapable {
         @usableFromInline
         let _words: UnsafeMutablePointer<UInt>
 
@@ -39,6 +39,7 @@ extension Bit.Vector.Ones.View {
         var _currentWord: UInt
 
         @inlinable
+        @_lifetime(copy view)
         package init(view: Bit.Vector.Ones.View) {
             unsafe self._words = view._words
             self._wordCount = view._wordCount

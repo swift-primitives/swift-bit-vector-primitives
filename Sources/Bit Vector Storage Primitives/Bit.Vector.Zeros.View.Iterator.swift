@@ -22,7 +22,7 @@ extension Bit.Vector.Zeros.View {
     ///
     /// - Complexity: O(zero-count) total across all `next()` calls.
     @safe
-    public struct Iterator: Iterator_Primitive.Iterator.`Protocol`, IteratorProtocol {
+    public struct Iterator: Iterator_Primitive.Iterator.`Protocol`, Copyable, ~Escapable {
         @usableFromInline
         let _words: UnsafeMutablePointer<UInt>
 
@@ -39,6 +39,7 @@ extension Bit.Vector.Zeros.View {
         var _currentWord: UInt
 
         @inlinable
+        @_lifetime(copy view)
         package init(view: Bit.Vector.Zeros.View) {
             unsafe self._words = view._words
             self._wordCount = view._wordCount

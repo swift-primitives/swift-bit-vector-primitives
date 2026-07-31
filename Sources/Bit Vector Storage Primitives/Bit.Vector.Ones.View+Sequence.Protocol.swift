@@ -25,7 +25,7 @@ extension Bit.Vector.Ones.View: Iterable {
 
     /// Returns an iterator over the set-bit indices.
     @inlinable
-    @_lifetime(borrow self)
+    @_lifetime(copy self)
     @_implements(Iterable,makeIterator())
     public borrowing func iterableMakeIterator() -> Iterator_Primitive.Iterator.Materializing<Iterator> {
         Iterator_Primitive.Iterator.Materializing(Iterator(view: copy self))
@@ -33,8 +33,9 @@ extension Bit.Vector.Ones.View: Iterable {
 
     /// Returns an iterator over the set-bit indices.
     @inlinable
-    public func makeIterator() -> Iterator {
-        Iterator(view: self)
+    @_lifetime(copy self)
+    public borrowing func makeIterator() -> Iterator {
+        Iterator(view: copy self)
     }
 }
 
