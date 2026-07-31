@@ -14,10 +14,15 @@ import Index_Primitives
 extension Bit.Vector {
     /// Non-mutating accessor for iterating set bits.
     ///
-    /// Returns a lightweight view that captures the word pointer, word count,
-    /// and capacity. Safe to use from any context including `deinit`.
+    /// Returns a lightweight view that borrows the word pointer, word count,
+    /// and capacity. Safe to use from any context including `deinit`. The
+    /// returned view cannot outlive `self` — escaping it past this vector's
+    /// lifetime is rejected at compile time.
     @inlinable
     public var ones: Ones.View {
-        unsafe Ones.View(words: _words, wordCount: _wordCount, capacity: capacity)
+        @_lifetime(borrow self)
+        borrowing get {
+            Ones.View(vector: self)
+        }
     }
 }

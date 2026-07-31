@@ -38,17 +38,25 @@ extension Bit.Vector.Ones.View: Iterable {
     }
 }
 
-// MARK: - Swift.Sequence
+// MARK: - forEach
+//
+// Not `Swift.Sequence`: `View` is `~Escapable` (issue swift-primitives/
+// swift-bit-vector-primitives#3), and `Swift.Sequence`'s `Self` requirement
+// does not suppress `Escapable`, so a `~Escapable` type cannot conform.
+// `forEach` is declared directly on the concrete type instead — every
+// existing call site already used `.ones.forEach { ... }`, never a generic
+// `Sequence`-constrained call, so this is source-compatible.
 
-extension Bit.Vector.Ones.View: Swift.Sequence {
-    /// Forces closure inlining during mandatory SIL passes by shadowing
-    /// `Swift.Sequence.forEach` with `@inline(always)`.
+extension Bit.Vector.Ones.View {
+    /// Forces closure inlining during mandatory SIL passes by declaring
+    /// `forEach` directly on the concrete type with `@inline(always)`.
     ///
-    /// Without this, `Swift.Sequence.forEach` (which is `@inlinable` but not
-    /// `@inline(always)`) leaves closures as separate `partial_apply` SIL
-    /// entities. In class deinits with `~Copyable` generic parameters, the
-    /// `partial_apply` captures `self` with `ForwardingConsume` semantics,
-    /// and CopyPropagation cannot track the lifetime — causing a crash.
+    /// Without this, the generic `Iterable.forEach` default (which is
+    /// `@inlinable` but not `@inline(always)`) leaves closures as separate
+    /// `partial_apply` SIL entities. In class deinits with `~Copyable` generic
+    /// parameters, the `partial_apply` captures `self` with
+    /// `ForwardingConsume` semantics, and CopyPropagation cannot track the
+    /// lifetime — causing a crash.
     @inline(always)
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
