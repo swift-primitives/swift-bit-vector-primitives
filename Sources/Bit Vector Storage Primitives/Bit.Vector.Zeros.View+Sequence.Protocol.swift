@@ -27,7 +27,9 @@ extension Bit.Vector.Zeros.View: Iterable {
     @inlinable
     @_lifetime(borrow self)
     @_implements(Iterable,makeIterator())
-    public borrowing func iterableMakeIterator() -> Iterator_Primitive.Iterator.Materializing<Iterator> {
+    public borrowing func iterableMakeIterator()
+        -> Iterator_Primitive.Iterator.Materializing<Iterator>
+    {
         Iterator_Primitive.Iterator.Materializing(Iterator(view: copy self))
     }
 

@@ -55,7 +55,9 @@ extension Bit.Vector.Zeros.Inline: Iterable {
     @inlinable
     @_lifetime(borrow self)
     @_implements(Iterable,makeIterator())
-    public borrowing func iterableMakeIterator() -> Iterator_Primitive.Iterator.Materializing<Iterator> {
+    public borrowing func iterableMakeIterator()
+        -> Iterator_Primitive.Iterator.Materializing<Iterator>
+    {
         Iterator_Primitive.Iterator.Materializing(Iterator(storage: _storage, capacity: _capacity))
     }
 
