@@ -27,7 +27,11 @@ extension Property.Inout where Tag == Bit.Vector.Set, Base: Bit.Vector.`Protocol
         // WHY: the leading guard ensures range.upperBound > range.lowerBound, so upperBound is at least one; its .predecessor is in range and .exact() can never throw.
         // swift-format-ignore: NeverUseForceTry
         // swiftlint:disable:next force_try
-        let endLoc = Bit.Pack<UInt>.Location(index: try! range.upperBound.predecessor.exact(), bitsPerWord: .bitsPerWord)
+        let endIndex = try! range.upperBound.predecessor.exact()
+        let endLoc = Bit.Pack<UInt>.Location(
+            index: endIndex,
+            bitsPerWord: .bitsPerWord
+        )
         let startBit = startLoc.bit.magnitude
         let endBit = endLoc.bit.magnitude
 

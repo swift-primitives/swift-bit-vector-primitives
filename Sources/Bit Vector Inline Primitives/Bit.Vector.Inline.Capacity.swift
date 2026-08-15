@@ -18,7 +18,9 @@ extension Bit.Vector.Inline {
 
 extension Bit.Vector.Inline.Capacity {
     /// The mutating property-view type for `capacity` accessors.
-    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
+    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<
+        wordCount
+    >
 }
 
 // MARK: - Property: capacity.maximum / capacity.remaining

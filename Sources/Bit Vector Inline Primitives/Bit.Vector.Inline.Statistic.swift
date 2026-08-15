@@ -18,7 +18,9 @@ extension Bit.Vector.Inline {
 
 extension Bit.Vector.Inline.Statistic {
     /// The mutating property-view type for `statistic` accessors.
-    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
+    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<
+        wordCount
+    >
 }
 
 // MARK: - Property: statistic.true / statistic.false
@@ -39,5 +41,7 @@ where Tag == Bit.Vector.Inline<n>.Statistic, Base == Bit.Vector.Inline<n>, Eleme
 
     /// The number of `false` bits.
     @inlinable
-    public var `false`: Bit.Index.Count { base.value._count.subtract.saturating(base.value.popcount) }
+    public var `false`: Bit.Index.Count {
+        base.value._count.subtract.saturating(base.value.popcount)
+    }
 }

@@ -73,7 +73,8 @@ extension Bit.Vector.Zeros.View.Iterator {
         // Compute global bit index via pack location
         let wordAsCount = Index_Primitives.Index<UInt>.Count(_wordIndex)
         let baseBitCount = wordAsCount * .bitsPerWord
-        let globalIndex = baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
+        let globalIndex =
+            baseBitCount.map(Ordinal.init) + Bit.Index.Count(Cardinal(UInt(bitPosition)))
 
         guard globalIndex < _capacity else { return nil }
         return globalIndex

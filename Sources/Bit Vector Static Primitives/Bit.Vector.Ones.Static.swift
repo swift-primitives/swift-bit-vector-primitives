@@ -50,7 +50,9 @@ extension Bit.Vector.Ones.Static: Iterable {
     @inlinable
     @_lifetime(borrow self)
     @_implements(Iterable,makeIterator())
-    public borrowing func iterableMakeIterator() -> Iterator_Primitive.Iterator.Materializing<Iterator> {
+    public borrowing func iterableMakeIterator()
+        -> Iterator_Primitive.Iterator.Materializing<Iterator>
+    {
         Iterator_Primitive.Iterator.Materializing(Iterator(storage: _storage))
     }
 

@@ -62,7 +62,8 @@ extension Bit.Vector {
         ///
         /// - Throws: `Error.overflow` if the sequence exceeds capacity.
         @inlinable
-        public init<S: Swift.Sequence>(capacity: Bit.Index.Count, _ elements: S) throws(Self.Error) where S.Element == Bool {
+        public init<S: Swift.Sequence>(capacity: Bit.Index.Count, _ elements: S) throws(Self.Error)
+        where S.Element == Bool {
             self.init(capacity: capacity)
             for element in elements {
                 try append(element)
@@ -73,7 +74,11 @@ extension Bit.Vector {
         ///
         /// - Throws: `Error.overflow` if count exceeds capacity.
         @inlinable
-        public init(capacity: Bit.Index.Count, repeating value: Bool, count: Bit.Index.Count) throws(Self.Error) {
+        public init(
+            capacity: Bit.Index.Count,
+            repeating value: Bool,
+            count: Bit.Index.Count
+        ) throws(Self.Error) {
             guard count <= capacity else {
                 throw .overflow
             }

@@ -18,7 +18,9 @@ extension Bit.Vector.Inline {
 
 extension Bit.Vector.Inline.All {
     /// The mutating property-view type for `all` accessors.
-    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<wordCount>
+    public typealias View = Property<Self, Bit.Vector.Inline<wordCount>>.Inout.Typed<Bit>.Valued<
+        wordCount
+    >
 }
 
 // MARK: - Property: all.true / all.false
