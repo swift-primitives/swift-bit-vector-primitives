@@ -20,7 +20,7 @@ extension Property.Inout where Tag == Bit.Vector.Clear, Base: Bit.Vector.`Protoc
     /// - Parameter range: The half-open range of bit indices to clear.
     /// - Complexity: O(wordCount) — constant for fixed-size vectors.
     @inlinable
-    public func range(_ range: Swift.Range<Bit.Index>) {
+    public mutating func range(_ range: Swift.Range<Bit.Index>) {
         guard range.upperBound > range.lowerBound else { return }
 
         let startLoc = Bit.Pack<UInt>.Location(index: range.lowerBound, bitsPerWord: .bitsPerWord)
