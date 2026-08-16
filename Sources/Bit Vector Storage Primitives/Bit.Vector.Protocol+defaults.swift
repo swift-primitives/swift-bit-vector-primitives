@@ -176,7 +176,7 @@ extension Property.Inout where Tag == Bit.Vector.Pop, Base: Bit.Vector.`Protocol
     /// - Returns: The index of the lowest set bit, or `nil` if no bits are set.
     /// - Complexity: O(words) per call, O(words * popcount) total for full drain.
     @inlinable
-    public func first() -> Bit.Index? {
+    public mutating func first() -> Bit.Index? {
         base.value.popFirst()
     }
 }
