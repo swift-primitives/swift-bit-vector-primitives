@@ -185,7 +185,7 @@ extension Property.Inout where Tag == Bit.Vector.Set, Base: Bit.Vector.`Protocol
     /// Sets all bits to true.
     @inlinable
     public mutating func all() {
-        unsafe Base.setAll(&base.value)
+        Base.setAll(&base.value)
     }
 }
 
@@ -193,6 +193,6 @@ extension Property.Inout where Tag == Bit.Vector.Clear, Base: Bit.Vector.`Protoc
     /// Clears all bits to false.
     @inlinable
     public mutating func all() {
-        unsafe Base.clearAll(&base.value)
+        Base.clearAll(&base.value)
     }
 }

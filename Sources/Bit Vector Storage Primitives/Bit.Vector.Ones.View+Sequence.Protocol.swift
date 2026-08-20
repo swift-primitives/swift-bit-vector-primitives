@@ -11,7 +11,7 @@
 
 public import Iterator_Chunk_Primitives
 public import Iterator_Primitive
-public import Sequence_Primitives
+import Sequence_Primitives
 
 // MARK: - Sequence.Protocol
 

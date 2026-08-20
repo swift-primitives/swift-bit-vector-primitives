@@ -29,7 +29,7 @@ extension Bit.Vector.Inline {
     /// A property view exposing `capacity.maximum` and `capacity.remaining`.
     @inlinable
     public var capacity: Capacity.View {
-        mutating _read { yield unsafe .init(&self) }
+        mutating _read { yield .init(&self) }
     }
 }
 

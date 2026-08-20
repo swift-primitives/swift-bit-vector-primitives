@@ -29,7 +29,7 @@ extension Bit.Vector.Inline {
     /// A property view exposing `statistic.true` and `statistic.false`.
     @inlinable
     public var statistic: Statistic.View {
-        mutating _read { yield unsafe .init(&self) }
+        mutating _read { yield .init(&self) }
     }
 }
 

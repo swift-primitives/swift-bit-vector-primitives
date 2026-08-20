@@ -29,7 +29,7 @@ extension Bit.Vector.Inline {
     /// A property view exposing `all.true` and `all.false`.
     @inlinable
     public var all: All.View {
-        mutating _read { yield unsafe .init(&self) }
+        mutating _read { yield .init(&self) }
     }
 }
 
