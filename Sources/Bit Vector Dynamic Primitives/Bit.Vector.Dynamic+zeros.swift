@@ -1,30 +1,7 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Property_Primitives
 
-// MARK: - Property: zeros.forEach
-
 extension Bit.Vector.Dynamic {
-    /// Property view for iterating clear (false) bit indices.
-    ///
-    /// Uses complement + Wegner/Kernighan word-level bit manipulation
-    /// for efficient sparse iteration of zero bits.
-    ///
-    /// ```swift
-    /// var bits = Bit.Vector.Dynamic([true, false, true, false])
-    /// bits.zeros.forEach { index in
-    ///     print(index)  // 1, 3
-    /// }
-    /// ```
+
     @inlinable
     public var zeros: Property<Bit.Vector.Zeros, Self>.Inout {
         mutating _read {
@@ -34,7 +11,7 @@ extension Bit.Vector.Dynamic {
 }
 
 extension Property.Inout where Tag == Bit.Vector.Zeros, Base == Bit.Vector.Dynamic {
-    /// Iterates over indices of clear (false) bits.
+
     @inlinable
     public func forEach(_ body: (Bit.Index) -> Void) {
         let storage = base.value._storage

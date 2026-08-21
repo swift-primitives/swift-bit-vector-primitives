@@ -1,20 +1,7 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Affine_Primitives
 
-// MARK: - Append and Remove
-
 extension Bit.Vector.Dynamic {
-    /// Appends a boolean value.
+
     @inlinable
     public mutating func append(_ value: Bool) {
         let loc = Bit.Pack<UInt>.Location(count: _count, bitsPerWord: .bitsPerWord)
@@ -30,13 +17,11 @@ extension Bit.Vector.Dynamic {
         _count += .one
     }
 
-    /// Appends a `Bit` value.
     @inlinable
     public mutating func append(_ bit: Bit) {
         append(Bool(bit))
     }
 
-    /// Removes and returns the last element, or `nil` if empty.
     @discardableResult
     @inlinable
     public mutating func popLast() -> Bool? {
@@ -48,7 +33,6 @@ extension Bit.Vector.Dynamic {
         return value
     }
 
-    /// Removes the last element.
     @inlinable
     public mutating func removeLast() {
         precondition(_count > .zero, "Cannot remove from empty vector")
@@ -57,7 +41,6 @@ extension Bit.Vector.Dynamic {
         _storage[loc.word] &= ~loc.mask
     }
 
-    /// Removes all elements.
     @inlinable
     public mutating func removeAll(keepingCapacity: Bool = false) {
         if keepingCapacity {
@@ -71,12 +54,8 @@ extension Bit.Vector.Dynamic {
     }
 }
 
-// MARK: - Resize
-
 extension Bit.Vector.Dynamic {
-    /// Resizes the vector to the given count.
-    ///
-    /// New bits are initialized to `fill` (default: false).
+
     @inlinable
     public mutating func resize(to newCount: Bit.Index.Count, fill: Bool = false) {
         let newPack = Bit.Pack<UInt>(count: newCount, bitsPerWord: .bitsPerWord)

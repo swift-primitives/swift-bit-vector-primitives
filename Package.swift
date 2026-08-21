@@ -12,12 +12,12 @@ let package = Package(
         .visionOS(.v27),
     ],
     products: [
-        // MARK: - Base
+
         .library(
             name: "Bit Vector Storage Primitives",
             targets: ["Bit Vector Storage Primitives"]
         ),
-        // MARK: - Variants
+
         .library(
             name: "Bit Vector Static Primitives",
             targets: ["Bit Vector Static Primitives"]
@@ -34,12 +34,12 @@ let package = Package(
             name: "Bit Vector Dynamic Primitives",
             targets: ["Bit Vector Dynamic Primitives"]
         ),
-        // MARK: - Umbrella
+
         .library(
             name: "Bit Vector Primitives",
             targets: ["Bit Vector Primitives"]
         ),
-        // MARK: - Test Support
+
         .library(
             name: "Bit Vector Primitives Test Support",
             targets: ["Bit Vector Primitives Test Support"]
@@ -76,10 +76,7 @@ let package = Package(
         ),
     ],
     targets: [
-        // MARK: - Base
-        // Owns `Bit.Vector` (extends upstream `Bit_Primitives.Bit`), its protocol,
-        // ops, and the Ones/Zeros View+Sequence machinery. Replaces the dissolved
-        // internal-only Core target (L1 core-dissolution sweep 2026-06-23).
+
         .target(
             name: "Bit Vector Storage Primitives",
             dependencies: [
@@ -94,7 +91,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Variants
         .target(
             name: "Bit Vector Static Primitives",
             dependencies: [
@@ -141,7 +137,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Umbrella
         .target(
             name: "Bit Vector Primitives",
             dependencies: [
@@ -153,7 +148,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Test Support
         .target(
             name: "Bit Vector Primitives Test Support",
             dependencies: [

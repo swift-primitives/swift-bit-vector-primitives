@@ -1,117 +1,9 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Bit_Vector_Primitives
 import Bit_Vector_Primitives_Test_Support
 import Cardinal_Primitives
 import Iterator_Chunk_Primitives
 import Iterator_Primitive
 import Testing
-
-// MARK: - #3 negative control: escaping `ones`/`zeros` past the vector must be rejected
-//
-// This repository's testing conventions have no "must fail to compile" fixture
-// harness (no trybuild-style support target — see the swift-property-primitives
-// `Property.Consume.State Tests.swift` precedent), so the rejection is
-// documented here as a commented, non-compiling control rather than invented
-// ad hoc as an always-passing test.
-//
-// Reproduced with a standalone reduced-shape probe (`swiftc -typecheck
-// -swift-version 6 -enable-experimental-feature Lifetimes
-// -enable-experimental-feature LifetimeDependence -strict-memory-safety`,
-// Apple Swift 6.3.3, swift-6.3.3-RELEASE) mirroring `Bit.Vector`'s
-// `~Copyable` owner / `Ones.View`'s `Copyable, ~Escapable`,
-// lifetime-dependent-on-the-owner shape — not compiled against the real
-// dependency graph, which requires the package's full SwiftPM resolution
-// (forbidden here as evidence; see the workspace skill). The reduced probe's
-// `View.init(owner: borrowing Owner)` tagged `@_lifetime(borrow owner)`, and
-// `Owner.view { @_lifetime(borrow self) borrowing get { View(owner: self) } }`,
-// is exactly the shape `Bit.Vector.Ones.View.init(vector:)` /
-// `Bit.Vector.ones` (and the `Zeros` counterparts) now use.
-//
-// ```swift
-// // MUST NOT COMPILE. If this starts compiling clean, `ones`/`zeros` have
-// // stopped being lifetime-dependent on their owning vector — the
-// // use-after-free the issue swift-primitives/swift-bit-vector-primitives#3
-// // fixed has regressed.
-// func f() -> Bit.Vector.Ones.View {
-//     let bits = Bit.Vector(capacity: 8)
-//     return bits.ones
-// }
-// // error: a function with a ~Escapable result needs a parameter to depend on
-// // note: '@_lifetime(immortal)' can be used to indicate that values produced
-// //       by this initializer have no lifetime dependencies
-// ```
-//
-// Do not uncomment this into a real, always-passing test: a function
-// returning `Bit.Vector.Ones.View` with no parameter for it to depend on is
-// exactly the shape this comment documents as rejected, so it cannot live as
-// executable Swift in this file without breaking the build.
-
-// MARK: - #3 (reopened) negative control: escaping the scalar `Iterator` past
-// the vector must be rejected
-//
-// Residue of the fix above: `Bit.Vector.Ones.View.Iterator` / `Zeros.View.
-// Iterator` were fully `Escapable` (via `Swift.IteratorProtocol`, which pins
-// `Escapable`), so `v.ones.makeIterator()` could escape the vector with zero
-// diagnostics — ASan proved the resulting heap-use-after-free in
-// `Iterator.next()`. The corrective: `Iterator` is now `Copyable, ~Escapable`
-// (dropping `Swift.IteratorProtocol`, keeping the `Iterator_Primitive.Iterator.
-// `Protocol`` conformance that supplies `next()`), `init(view:)` is tagged
-// `@_lifetime(copy view)`, and `makeIterator()` is tagged `@_lifetime(copy
-// self)`.
-//
-// `iterableMakeIterator()` — the `@_implements(Iterable, makeIterator())`
-// witness — is tagged `@_lifetime(borrow self)`, matching `Iterable
-// .makeIterator()`'s own declared dependence exactly (and matching every
-// other `Iterable` conformer in the ecosystem, e.g. `Bit.Vector.Ones.Static` /
-// `.Inline`). An earlier revision (swift-primitives/swift-bit-vector
-// -primitives#5) used `@_lifetime(copy self)` on this witness instead, to
-// let `iterableMakeIterator()` be chained directly off an ephemeral `.ones`
-// temporary without rejecting the call — see the "Chained…" test below for
-// that scenario, now written against a named local instead. Apple Swift
-// 6.3.3 release accepted the mismatched `copy self` witness against the
-// `borrow self` requirement, but Swift 6.4.x-nightly and main-nightly
-// rejected the whole conformance (`type 'Bit.Vector.Ones.View' does not
-// conform to protocol 'Iterable'`) — an exact-kind-matching check on
-// `@_lifetime`-annotated witnesses that release does not yet enforce. Matching
-// the requirement's dependence kind exactly is the shape both toolchains
-// accept; the more permissive ephemeral-chaining convenience is not.
-//
-// Verified against the real package (Apple Swift 6.3.3, swift-6.3.3-RELEASE):
-// escape is now rejected by the mandatory SIL lifetime-dependence diagnostic
-// pass — not by `-typecheck`, which passes this snippet clean (confirmed:
-// `swiftc -typecheck` against the built module emits nothing for the snippet
-// below; only `-emit-sil` / a real `swift build` surfaces the rejection).
-//
-// ```swift
-// // MUST NOT COMPILE. If this starts compiling clean, the scalar iterator
-// // has stopped being lifetime-dependent on its owning vector — the
-// // heap-use-after-free this reopening fixed has regressed.
-// func scalarIteratorEscape() {
-//     var iterator: Bit.Vector.Ones.View.Iterator
-//     do {
-//         let bits = Bit.Vector(capacity: 8)
-//         iterator = bits.ones.makeIterator()
-//     }
-//     _ = iterator.next()
-// }
-// // error: lifetime-dependent variable 'iterator' escapes its scope
-// //  note: it depends on the lifetime of variable 'bits'
-// //  note: this use of the lifetime-dependent value is out of scope
-// ```
-//
-// Do not uncomment this into a real, always-passing test: it is exactly the
-// escape shape the reopening fixed, so it cannot live as executable Swift in
-// this file without breaking the build.
 
 extension Bit.Vector {
     @Suite("Bit.Vector Tests")
@@ -209,23 +101,6 @@ extension Bit.Vector {
             #expect(visited[1] == expected1)
         }
 
-        // Regression for the reopened #3 corrective, now against a named
-        // local rather than the ephemeral `.ones` temporary (issue
-        // swift-primitives/swift-bit-vector-primitives#5): binding the view
-        // first and calling `iterableMakeIterator()` on it must hold for the
-        // vector's whole lifetime under `@_lifetime(borrow self)` — the
-        // dependence kind `Iterable.makeIterator()` itself declares, and the
-        // one every other `Iterable` conformer in the ecosystem uses.
-        // Calling `iterableMakeIterator()` directly on the unbound `.ones`
-        // temporary (`bits.ones.iterableMakeIterator()`) does NOT compile
-        // under `borrow self` — "lifetime-dependent variable 'm' escapes its
-        // scope" — because the borrow scope of an unnamed temporary ends at
-        // the end of the full expression; binding it to a local first (as
-        // below) gives the dependency a scope that outlives the call. This
-        // is the ordinary `~Escapable`-value discipline (bind before you
-        // chain), not a regression: see the file-level comment above for why
-        // `copy self` (which does admit the unbound-temporary form) is not
-        // the shape that both the 6.3 release and nightly toolchains accept.
         @Test
         func `iterableMakeIterator holds across the vector's lifetime`() {
             let capacity: Bit.Index.Count = 16
@@ -253,18 +128,6 @@ extension Bit.Vector {
     }
 }
 
-// MARK: - #4: subscript bounds safety
-//
-// swift-primitives/swift-bit-vector-primitives#4 — the subscript performed no
-// bounds check while `toggle(_:)` did. Per the coordinator's ruled posture
-// (issue comment 5140090959, 2026-07-31): the subscript now adopts the same
-// checked posture `toggle(_:)` already has, and the declared `@safe` absorber
-// claim at the type's declaration stands unchanged.
-//
-// The out-of-bounds cases fork a child process (Swift Testing exit tests) so
-// the trap cannot bring down the parent test run; per the swift-span-primitives
-// `Span.Raw.Mutable+"Bounds Safety"` precedent this suite is `.serialized` to
-// avoid interleaving forks with concurrently running sibling tests.
 extension Bit.Vector {
     @Suite(.serialized) struct `Bounds Safety` {
         @Suite struct Unit {}
@@ -331,7 +194,6 @@ extension Bit.Vector.`Bounds Safety`.`Edge Case` {
         #expect(copy[0] == true)
         #expect(copy[63] == true)
 
-        // Modify original, copy unchanged
         original[0] = false
         #expect(original[0] == false)
         #expect(copy[0] == true)

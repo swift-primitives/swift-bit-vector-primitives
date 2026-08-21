@@ -1,29 +1,9 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 public import Iterator_Chunk_Primitives
 public import Iterator_Primitive
 import Sequence_Primitives
 
 extension Bit.Vector.Zeros {
-    // SAFETY: Safe by construction — backing storage uses only stdlib
-    // SAFETY: safe types; `@safe` documents that this type performs no
-    // SAFETY: unsafe operations.
-    /// A sequence of clear-bit indices for `Bit.Vector.Bounded`.
-    ///
-    /// Copies the `ContiguousArray` from the bounded vector so iteration does
-    /// not alias mutable storage. Complement of `Ones.Bounded`.
-    ///
-    /// Conforms to both `Sequence.Protocol` and `Swift.Sequence`, providing
-    /// `forEach`, `map`, `filter`, `for-in`, and all stdlib sequence algorithms.
+
     @safe
     public struct Bounded: Copyable, Sendable {
         @usableFromInline
@@ -40,16 +20,8 @@ extension Bit.Vector.Zeros {
     }
 }
 
-// MARK: - Word-Level Search
-
 extension Bit.Vector.Zeros.Bounded {
-    /// The first clear bit position below `max`, or `nil` if none.
-    ///
-    /// Word-level scanning: inverts each word and uses
-    /// `trailingZeroBitCount` to find the lowest zero. O(words).
-    ///
-    /// - Parameter max: Upper bound (exclusive) on the bit position.
-    /// - Returns: The first clear bit position below `max`, or `nil` if none.
+
     @inlinable
     public func first(max: Bit.Index.Count) -> Bit.Index? {
         for i in 0..<_storage.count {
@@ -68,17 +40,13 @@ extension Bit.Vector.Zeros.Bounded {
     }
 }
 
-// MARK: - Sequence.Protocol
-
 extension Bit.Vector.Zeros.Bounded: Iterable {
-    /// The element type.
+
     public typealias Element = Bit.Index
 
-    /// The iterator type for `Iterable` conformance.
     @_implements(Iterable,Iterator)
     public typealias IterableIterator = Iterator_Primitive.Iterator.Materializing<Iterator>
 
-    /// Returns an iterator over the clear-bit indices.
     @inlinable
     @_lifetime(borrow self)
     @_implements(Iterable,makeIterator())
@@ -88,13 +56,10 @@ extension Bit.Vector.Zeros.Bounded: Iterable {
         Iterator_Primitive.Iterator.Materializing(Iterator(storage: _storage, capacity: _capacity))
     }
 
-    /// Returns an iterator over the clear-bit indices.
     @inlinable
     public func makeIterator() -> Iterator {
         Iterator(storage: _storage, capacity: _capacity)
     }
 }
-
-// MARK: - Swift.Sequence
 
 extension Bit.Vector.Zeros.Bounded: Swift.Sequence {}

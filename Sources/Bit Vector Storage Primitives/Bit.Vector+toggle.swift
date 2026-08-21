@@ -1,18 +1,5 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 extension Bit.Vector {
-    /// Toggles the bit at the given index.
-    ///
-    /// - Precondition: `index < capacity`.
+
     @inlinable
     public nonmutating func toggle(_ index: Bit.Index) {
         precondition(index < capacity, "Index out of bounds")

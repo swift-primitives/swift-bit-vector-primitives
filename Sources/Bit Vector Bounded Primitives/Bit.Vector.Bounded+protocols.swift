@@ -1,18 +1,5 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
-// MARK: - Equatable
-
 extension Bit.Vector.Bounded: Equatable {
-    /// Returns whether two bounded vectors hold the same bits.
+
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs._count == rhs._count else { return false }
@@ -27,10 +14,8 @@ extension Bit.Vector.Bounded: Equatable {
     }
 }
 
-// MARK: - Hashable
-
 extension Bit.Vector.Bounded: Hashable {
-    /// Feeds the vector's bits into the given hasher.
+
     @inlinable
     public func hash(into hasher: inout Hasher) {
         let pack = Bit.Pack<UInt>(count: _count, bitsPerWord: .bitsPerWord)
@@ -44,10 +29,8 @@ extension Bit.Vector.Bounded: Hashable {
     }
 }
 
-// MARK: - CustomStringConvertible
-
 extension Bit.Vector.Bounded: CustomStringConvertible {
-    /// A textual representation of the value.
+
     public var description: String {
         let bits = prefix(64).map { $0 ? "1" : "0" }.joined()
         let suffix = Int(clamping: _count) > 64 ? "..." : ""

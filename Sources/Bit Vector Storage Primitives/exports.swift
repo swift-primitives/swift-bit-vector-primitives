@@ -1,5 +1,3 @@
-// exports.swift
-
 @_exported public import Bit_Pack_Primitives
 @_exported public import Bit_Primitives
 @_exported public import Index_Primitives

@@ -1,35 +1,16 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Index_Primitives
 import Property_Primitives
 
-// MARK: - Derived Word Count
-
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
-    /// The number of `UInt` words in backing storage.
-    ///
-    /// Derived from `bitCapacity` via `Bit.Pack<UInt>`.
+
     @inlinable
     public var wordCount: Int {
         Int(bitPattern: Bit.Pack<UInt>(count: bitCapacity, bitsPerWord: .bitsPerWord).words.count)
     }
 }
 
-// MARK: - Popcount
-
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
-    /// The number of bits set to true.
-    ///
-    /// - Complexity: O(n/64) using hardware popcount.
+
     @inlinable
     public var popcount: Bit.Index.Count {
         var total: UInt = 0
@@ -40,10 +21,8 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
     }
 }
 
-// MARK: - All False / All True
-
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
-    /// Whether all bits are false (no bits set).
+
     @inlinable
     public var allFalse: Bool {
         for i in 0..<wordCount {
@@ -52,20 +31,14 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
         return true
     }
 
-    /// Whether all bits are true (up to capacity).
     @inlinable
     public var allTrue: Bool {
         popcount == bitCapacity
     }
 }
 
-// MARK: - Clear All / Set All
-
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
-    /// Clears all bits to false.
-    ///
-    /// Core logic as static method per [IMPL-023]. Instance method and
-    /// `Property.Inout` `.clear.all()` both delegate here.
+
     @inlinable
     public static func clearAll(_ vector: inout Self) {
         for i in 0..<vector.wordCount {
@@ -73,10 +46,6 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
         }
     }
 
-    /// Sets all bits to true (up to capacity).
-    ///
-    /// Core logic as static method per [IMPL-023]. Property.Inout
-    /// `.set.all()` delegates here.
     @inlinable
     public static func setAll(_ vector: inout Self) {
         let pack = Bit.Pack<UInt>(count: vector.bitCapacity, bitsPerWord: .bitsPerWord)
@@ -90,17 +59,8 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
     }
 }
 
-// MARK: - Pop First
-
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
-    /// Removes and returns the index of the lowest set bit.
-    ///
-    /// Scans words from the start, extracts the lowest set bit using
-    /// Wegner/Kernighan (`w &= w &- 1`), clears it in the backing storage,
-    /// and returns the global bit index.
-    ///
-    /// - Returns: The index of the lowest set bit, or `nil` if no bits are set.
-    /// - Complexity: O(words) per call, O(words * popcount) total for full drain.
+
     @inlinable
     public mutating func popFirst() -> Bit.Index? {
         for i in 0..<wordCount {
@@ -120,18 +80,14 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
     }
 }
 
-// MARK: - Any
-
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
-    /// Whether any bit is true.
+
     @inlinable
     public var any: Bool { !allFalse }
 }
 
-// MARK: - Property.Inout Accessors
-
 extension Bit.Vector.`Protocol` where Self: ~Copyable {
-    /// A mutating property view exposing `pop` operations.
+
     @inlinable
     public var pop: Property<Bit.Vector.Pop, Self>.Inout {
         mutating _read {
@@ -143,7 +99,6 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
         }
     }
 
-    /// A mutating property view exposing `set` operations.
     @inlinable
     public var `set`: Property<Bit.Vector.Set, Self>.Inout {
         mutating _read {
@@ -155,7 +110,6 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
         }
     }
 
-    /// A mutating property view exposing `clear` operations.
     @inlinable
     public var clear: Property<Bit.Vector.Clear, Self>.Inout {
         mutating _read {
@@ -168,13 +122,8 @@ extension Bit.Vector.`Protocol` where Self: ~Copyable {
     }
 }
 
-// MARK: - Property.Inout Methods
-
 extension Property.Inout where Tag == Bit.Vector.Pop, Base: Bit.Vector.`Protocol` & ~Copyable {
-    /// Removes and returns the index of the lowest set bit.
-    ///
-    /// - Returns: The index of the lowest set bit, or `nil` if no bits are set.
-    /// - Complexity: O(words) per call, O(words * popcount) total for full drain.
+
     @inlinable
     public mutating func first() -> Bit.Index? {
         base.value.popFirst()
@@ -182,7 +131,7 @@ extension Property.Inout where Tag == Bit.Vector.Pop, Base: Bit.Vector.`Protocol
 }
 
 extension Property.Inout where Tag == Bit.Vector.Set, Base: Bit.Vector.`Protocol` & ~Copyable {
-    /// Sets all bits to true.
+
     @inlinable
     public mutating func all() {
         Base.setAll(&base.value)
@@ -190,7 +139,7 @@ extension Property.Inout where Tag == Bit.Vector.Set, Base: Bit.Vector.`Protocol
 }
 
 extension Property.Inout where Tag == Bit.Vector.Clear, Base: Bit.Vector.`Protocol` & ~Copyable {
-    /// Clears all bits to false.
+
     @inlinable
     public mutating func all() {
         Base.clearAll(&base.value)

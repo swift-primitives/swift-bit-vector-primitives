@@ -1,14 +1,3 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Bit_Vector_Primitives
 import Bit_Vector_Primitives_Test_Support
 import Testing
@@ -17,8 +6,6 @@ enum BitVectorBoundedTests {
     @Suite struct Unit {}
     @Suite struct `Edge Case` {}
 }
-
-// MARK: - Unit Tests
 
 extension BitVectorBoundedTests.Unit {
     @Test
@@ -157,8 +144,6 @@ extension BitVectorBoundedTests.Unit {
         #expect(desc.contains("10"))
     }
 }
-
-// MARK: - Edge Cases
 
 extension BitVectorBoundedTests.`Edge Case` {
     @Test

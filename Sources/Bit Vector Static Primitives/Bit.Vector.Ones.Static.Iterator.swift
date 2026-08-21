@@ -1,22 +1,5 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 extension Bit.Vector.Ones.Static {
-    // SAFETY: Safe by construction — backing storage uses only stdlib
-    // SAFETY: safe types; `@safe` documents that this type performs no
-    // SAFETY: unsafe operations.
-    /// An iterator that produces set-bit indices from an `InlineArray` of words.
-    ///
-    /// Same Wegner/Kernighan algorithm as `Ones.View.Iterator` but reads from
-    /// a copied `InlineArray` instead of a pointer.
+
     @safe
     public struct Iterator: Iterator_Primitive.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
@@ -42,17 +25,16 @@ extension Bit.Vector.Ones.Static {
 }
 
 extension Bit.Vector.Ones.Static.Iterator {
-    /// Advances to and returns the next index, or `nil` when exhausted.
+
     @inlinable
     public mutating func next() -> Bit.Index? {
-        // Advance to next word with set bits
+
         while _currentWord == 0 {
             _wordIndex += 1
             guard _wordIndex < wordCount else { return nil }
             _currentWord = _storage[_wordIndex]
         }
 
-        // Wegner/Kernighan: extract lowest set bit
         let bitPosition = _currentWord.trailingZeroBitCount
         _currentWord &= _currentWord &- 1
 

@@ -1,22 +1,7 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Affine_Primitives
 
-// MARK: - Append and Remove
-
 extension Bit.Vector.Bounded {
-    /// Appends a boolean value.
-    ///
-    /// - Throws: `Error.overflow` if at capacity.
+
     @inlinable
     public mutating func append(_ value: Bool) throws(Self.Error) {
         guard _count < _capacity else {
@@ -29,15 +14,11 @@ extension Bit.Vector.Bounded {
         _count += .one
     }
 
-    /// Appends a `Bit` value.
-    ///
-    /// - Throws: `Error.overflow` if at capacity.
     @inlinable
     public mutating func append(_ bit: Bit) throws(Self.Error) {
         try append(Bool(bit))
     }
 
-    /// Removes and returns the last element, or `nil` if empty.
     @discardableResult
     @inlinable
     public mutating func popLast() -> Bool? {
@@ -49,7 +30,6 @@ extension Bit.Vector.Bounded {
         return value
     }
 
-    /// Removes the last element.
     @inlinable
     public mutating func removeLast() {
         precondition(_count > .zero, "Cannot remove from empty vector")
@@ -58,7 +38,6 @@ extension Bit.Vector.Bounded {
         _storage[loc.word] &= ~loc.mask
     }
 
-    /// Removes all elements.
     @inlinable
     public mutating func removeAll() {
         for i in 0..<_storage.count {

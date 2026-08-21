@@ -1,30 +1,9 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 public import Iterator_Chunk_Primitives
 public import Iterator_Primitive
 import Sequence_Primitives
 
 extension Bit.Vector.Ones {
-    // SAFETY: Safe by construction — backing storage uses only stdlib
-    // SAFETY: safe types; `@safe` documents that this type performs no
-    // SAFETY: unsafe operations.
-    /// A sequence of set-bit indices for `Bit.Vector.Inline`.
-    ///
-    /// Copies the `InlineArray` from the inline vector so iteration does not
-    /// alias mutable storage. Unlike `Ones.Static`, this checks against
-    /// the logical capacity (Inline tracks count, not just word capacity).
-    ///
-    /// Conforms to both `Sequence.Protocol` and `Swift.Sequence`, providing
-    /// `forEach`, `map`, `filter`, `for-in`, and all stdlib sequence algorithms.
+
     @safe
     public struct Inline<let wordCount: Int>: Copyable, Sendable {
         @usableFromInline
@@ -41,17 +20,13 @@ extension Bit.Vector.Ones {
     }
 }
 
-// MARK: - Sequence.Protocol
-
 extension Bit.Vector.Ones.Inline: Iterable {
-    /// The element type.
+
     public typealias Element = Bit.Index
 
-    /// The iterator type for `Iterable` conformance.
     @_implements(Iterable,Iterator)
     public typealias IterableIterator = Iterator_Primitive.Iterator.Materializing<Iterator>
 
-    /// Returns an iterator over the set-bit indices.
     @inlinable
     @_lifetime(borrow self)
     @_implements(Iterable,makeIterator())
@@ -61,13 +36,10 @@ extension Bit.Vector.Ones.Inline: Iterable {
         Iterator_Primitive.Iterator.Materializing(Iterator(storage: _storage, capacity: _capacity))
     }
 
-    /// Returns an iterator over the set-bit indices.
     @inlinable
     public func makeIterator() -> Iterator {
         Iterator(storage: _storage, capacity: _capacity)
     }
 }
-
-// MARK: - Swift.Sequence
 
 extension Bit.Vector.Ones.Inline: Swift.Sequence {}

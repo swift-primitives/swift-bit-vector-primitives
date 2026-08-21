@@ -1,26 +1,7 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-primitives open source project
-//
-// Copyright (c) 2024-2026 Coen ten Thije Boonkkamp and the swift-primitives project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE for license information
-//
-// ===----------------------------------------------------------------------===//
-
 import Index_Primitives
 
 extension Bit.Vector.Ones.Bounded {
-    // SAFETY: Safe by construction — backing storage uses only stdlib
-    // SAFETY: safe types; `@safe` documents that this type performs no
-    // SAFETY: unsafe operations.
-    /// An iterator that produces set-bit indices from a `ContiguousArray` of words.
-    ///
-    /// Same Wegner/Kernighan algorithm as `Ones.Static.Iterator` but reads from
-    /// a copied `ContiguousArray` instead of an `InlineArray`.
-    ///
-    /// - Complexity: O(popcount) total across all `next()` calls.
+
     @safe
     public struct Iterator: Iterator_Primitive.Iterator.`Protocol`, IteratorProtocol {
         @usableFromInline
@@ -50,21 +31,19 @@ extension Bit.Vector.Ones.Bounded {
 }
 
 extension Bit.Vector.Ones.Bounded.Iterator {
-    /// Advances to and returns the next index, or `nil` when exhausted.
+
     @inlinable
     public mutating func next() -> Bit.Index? {
-        // Advance to next word with set bits
+
         while _currentWord == 0 {
             _wordIndex += 1
             guard _wordIndex < _storage.count else { return nil }
             _currentWord = _storage[_wordIndex]
         }
 
-        // Wegner/Kernighan: extract lowest set bit
         let bitPosition = _currentWord.trailingZeroBitCount
         _currentWord &= _currentWord &- 1
 
-        // Compute global bit index via pack location
         let wordCount = Index_Primitives.Index<UInt>.Count(Cardinal(UInt(_wordIndex)))
         let baseBitCount = wordCount * .bitsPerWord
         let globalIndex =
